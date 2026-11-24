@@ -1,0 +1,19 @@
+{
+  "name": "safeplate-ai-fullstack",
+  "version": "1.0.0",
+  "description": "SafePlate AI - multilingual food label safety analysis powered by Gemini",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "pg": "^8.13.1"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

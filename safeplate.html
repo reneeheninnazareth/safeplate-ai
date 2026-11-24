@@ -1,0 +1,1796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Add inside <head> of safeplate_ai_multilingual_food_safety_ingredient_analysis.html -->
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@7/dist/tesseract.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multilingual Intelligent Food Safety & Ingredient Analysis System</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-bg-strong: rgba(15, 23, 42, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.16);
+            --glass-highlight: rgba(255, 255, 255, 0.25);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #060b19;
+            color: #f8fafc;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        h1, h2, h3, .font-display {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        /* Animated Mesh Gradient Background */
+        .ambient-bg {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background: 
+                radial-gradient(circle at 18% 18%, rgba(14, 165, 233, 0.14) 0%, transparent 45%),
+                radial-gradient(circle at 82% 15%, rgba(99, 102, 241, 0.14) 0%, transparent 45%),
+                radial-gradient(circle at 75% 82%, rgba(20, 184, 166, 0.13) 0%, transparent 50%),
+                radial-gradient(circle at 20% 85%, rgba(56, 189, 248, 0.10) 0%, transparent 45%),
+                linear-gradient(145deg, #070b14 0%, #0d1322 52%, #09101c 100%);
+            animation: bgPulse 20s ease-in-out infinite alternate;
+        }
+
+        @keyframes bgPulse {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.04); }
+        }
+
+        /* Floating Orbs */
+        .orb {
+            position: fixed;
+            border-radius: 9999px;
+            filter: blur(95px);
+            z-index: -1;
+            opacity: 0.32;
+            pointer-events: none;
+            animation: floatOrb 22s infinite ease-in-out;
+        }
+
+        @keyframes floatOrb {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(25px, -35px) scale(1.06); }
+            66% { transform: translate(-20px, 20px) scale(0.96); }
+        }
+
+        /* Core Glassmorphism Utilities */
+        .glass-panel {
+            background: linear-gradient(155deg, rgba(255, 255, 255, 0.085) 0%, rgba(15, 23, 42, 0.55) 100%);
+            backdrop-filter: blur(22px);
+            -webkit-backdrop-filter: blur(22px);
+            border: 1px solid rgba(148, 163, 184, 0.22);
+            box-shadow: 0 12px 36px 0 rgba(2, 6, 23, 0.55), inset 0 1px 0 0 rgba(255, 255, 255, 0.14);
+        }
+
+        .glass-card {
+            background: rgba(15, 23, 42, 0.48);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            box-shadow: 0 4px 20px rgba(2, 6, 23, 0.35);
+            transition: all 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .glass-card:hover {
+            background: rgba(30, 41, 59, 0.62);
+            border-color: rgba(56, 189, 248, 0.42);
+            transform: translateY(-2px);
+        }
+
+        .glass-input {
+            background: rgba(9, 14, 26, 0.72);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(148, 163, 184, 0.22);
+            color: #f8fafc;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .glass-input:focus {
+            outline: none;
+            border-color: #38bdf8;
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+        }
+
+        /* Scanner Laser Animation */
+        .scanner-laser {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #38bdf8, #818cf8, #38bdf8, transparent);
+            box-shadow: 0 0 14px #38bdf8, 0 0 26px #818cf8;
+            animation: scanMove 2.2s ease-in-out infinite;
+            z-index: 20;
+        }
+
+        @keyframes scanMove {
+            0%, 100% { top: 8%; opacity: 0.7; }
+            50% { top: 90%; opacity: 1; }
+        }
+
+        /* Soundwave Bars for Voice-to-Text Readout */
+        .wave-bar {
+            display: inline-block;
+            width: 3px;
+            height: 12px;
+            border-radius: 9999px;
+            background: #34d399;
+            animation: waveBounce 0.9s ease-in-out infinite;
+        }
+        .wave-bar:nth-child(2) { animation-delay: 0.15s; height: 18px; }
+        .wave-bar:nth-child(3) { animation-delay: 0.3s; height: 10px; }
+        .wave-bar:nth-child(4) { animation-delay: 0.45s; height: 16px; }
+        .wave-paused .wave-bar {
+            animation-play-state: paused;
+            height: 6px;
+            opacity: 0.45;
+        }
+
+        @keyframes waveBounce {
+            0%, 100% { transform: scaleY(0.5); }
+            50% { transform: scaleY(1.25); }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.4);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(52, 211, 153, 0.5);
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-sky-500/30 selection:text-sky-200">
+
+    <!-- Ambient Glassmorphic Backdrop -->
+    <div class="ambient-bg"></div>
+    <div class="orb w-96 h-96 bg-sky-500/25 top-[-5%] left-[-5%]"></div>
+    <div class="orb w-[30rem] h-[30rem] bg-indigo-500/25 bottom-[5%] right-[-8%]" style="animation-delay: -6s;"></div>
+    <div class="orb w-80 h-80 bg-teal-500/20 top-[40%] left-[45%]" style="animation-delay: -12s;"></div>
+
+    <!-- Floating Toast Notification -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- Sticky Glass Header -->
+    <header class="sticky top-0 z-40 glass-panel border-x-0 border-t-0 rounded-none px-3.5 sm:px-8 py-3">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-4">
+            <!-- Brand Identity (Responsive, Overflow-Safe Header) -->
+            <div class="flex items-center gap-3 min-w-0 flex-1">
+                <div class="w-10 h-10 sm:w-11 sm:h-11 shrink-0 rounded-2xl bg-gradient-to-br from-sky-400 via-teal-400 to-indigo-400 p-[1px] shadow-lg shadow-sky-500/20">
+                    <div class="w-full h-full bg-slate-950/85 backdrop-blur-md rounded-2xl flex items-center justify-center">
+                        <i data-lucide="leaf" class="w-5 h-5 sm:w-6 sm:h-6 text-sky-400"></i>
+                    </div>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <span id="ui-header-title" class="block font-display font-extrabold text-sm sm:text-base lg:text-lg leading-snug tracking-tight bg-gradient-to-r from-white via-slate-100 to-sky-200 bg-clip-text text-transparent break-words">
+                        Multilingual Intelligent Food Safety & Ingredient Analysis
+                    </span>
+                    <p id="ui-tagline" class="text-[11px] sm:text-xs text-slate-300/90 font-medium leading-tight mt-0.5 break-words">
+                        Understand the label. Make an informed choice.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Language Mode Selector & Quick Actions -->
+            <div class="flex items-center justify-between sm:justify-end gap-2.5 shrink-0 w-full sm:w-auto pt-1.5 sm:pt-0 border-t border-white/10 sm:border-t-0">
+                <div class="flex items-center gap-2 glass-card px-3 py-1.5 rounded-2xl flex-1 sm:flex-initial justify-between sm:justify-start">
+                    <div class="flex items-center gap-1.5">
+                        <i data-lucide="languages" class="w-4 h-4 text-sky-400 shrink-0"></i>
+                        <label for="language-select" id="ui-lang-label" class="text-xs font-medium text-slate-300">
+                            Language:
+                        </label>
+                    </div>
+                    <select id="language-select" aria-label="Select Language Mode" class="bg-transparent text-xs sm:text-sm font-semibold text-white focus:outline-none cursor-pointer pr-1">
+                        <option value="en" class="bg-slate-900 text-white">English (EN)</option>
+                        <option value="hi" class="bg-slate-900 text-white">हिन्दी (Hindi)</option>
+                        <option value="kn" class="bg-slate-900 text-white">ಕನ್ನಡ (Kannada)</option>
+                        <option value="bn" class="bg-slate-900 text-white">বাংলা (Bengali)</option>
+                        <option value="mr" class="bg-slate-900 text-white">मराठी (Marathi)</option>
+                        <option value="tcy" class="bg-slate-900 text-white">ತುಳು (Tulu)</option>
+                    </select>
+                </div>
+
+                <a href="#how-it-works" id="ui-nav-guide" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-2xl text-xs font-semibold text-slate-200 hover:text-white glass-card shrink-0">
+                    <i data-lucide="sparkles" class="w-3.5 h-3.5 text-sky-400"></i>
+                    <span class="hidden md:inline">How It Works</span>
+                    <span class="md:hidden">Guide</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-7xl mx-auto px-3.5 sm:px-8 pt-5 sm:pt-6 pb-20 space-y-7 sm:space-y-10">
+
+        <!-- Hero Banner + 4-Step Pipeline Progress Bar -->
+        <section class="glass-panel rounded-3xl p-5 sm:p-8 relative overflow-hidden">
+            <div class="absolute -right-16 -top-16 w-64 h-64 bg-sky-400/10 rounded-full blur-3xl pointer-events-none"></div>
+            
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-8">
+                <div class="max-w-2xl space-y-2">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/15 border border-sky-400/30 text-sky-300 text-xs font-semibold">
+                        <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+                        <span id="ui-hero-badge">Intelligent Food Safety & Ingredient Analysis System</span>
+                    </div>
+                    <h1 id="ui-hero-title" class="text-2xl sm:text-4xl font-extrabold tracking-tight text-white leading-tight">
+                        Turn complex food labels into clear, everyday explanations.
+                    </h1>
+                    <p id="ui-hero-subtitle" class="text-sm sm:text-base text-slate-300 leading-relaxed">
+                        Scan a package label or upload an image to instantly spot declared allergens and decode additives—then tap Explain whenever you want a simplified summary with live Voice-to-Text captions.
+                    </p>
+                </div>
+
+                <!-- Sample Presets Quick Loader -->
+                <div class="glass-card rounded-2xl p-4 lg:w-80 shrink-0 space-y-2.5">
+                    <div class="flex items-center justify-between">
+                        <span id="ui-sample-title" class="text-xs font-bold uppercase tracking-wider text-sky-300 flex items-center gap-1.5">
+                            <i data-lucide="flask-conical" class="w-3.5 h-3.5"></i>
+                            Instant Sample Labels
+                        </span>
+                        <span class="text-[11px] text-slate-400">1-Click Demo</span>
+                    </div>
+                    <div class="grid grid-cols-1 gap-2">
+                        <button onclick="loadPreset('hazelnut')" class="preset-btn text-left px-3 py-2 rounded-xl bg-white/[0.04] hover:bg-sky-500/20 border border-white/10 hover:border-sky-400/40 transition flex items-center justify-between group">
+                            <span class="text-xs font-semibold text-slate-100 group-hover:text-white">🍫 Chocolate Hazelnut Spread</span>
+                            <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-slate-400 group-hover:text-sky-300"></i>
+                        </button>
+                        <button onclick="loadPreset('masala')" class="preset-btn text-left px-3 py-2 rounded-xl bg-white/[0.04] hover:bg-sky-500/20 border border-white/10 hover:border-sky-400/40 transition flex items-center justify-between group">
+                            <span class="text-xs font-semibold text-slate-100 group-hover:text-white">🌶️ Spicy Masala Potato Chips</span>
+                            <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-slate-400 group-hover:text-sky-300"></i>
+                        </button>
+                        <button onclick="loadPreset('granola')" class="preset-btn text-left px-3 py-2 rounded-xl bg-white/[0.04] hover:bg-sky-500/20 border border-white/10 hover:border-sky-400/40 transition flex items-center justify-between group">
+                            <span class="text-xs font-semibold text-slate-100 group-hover:text-white">🥣 Oat & Almond Granola Bar</span>
+                            <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-slate-400 group-hover:text-sky-300"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interactive 4-Step Pipeline Progress Bar: SCAN -> EXTRACT -> ANALYSE -> EXPLAIN -->
+            <div class="pt-4 border-t border-white/10">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4" id="pipeline-steps">
+                    <!-- Step 1: SCAN -->
+                    <div id="step-1" class="pipeline-step glass-card rounded-2xl p-3.5 border-emerald-400/50 bg-emerald-500/10 relative overflow-hidden">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-[11px] font-extrabold tracking-widest uppercase text-emerald-300">01 • SCAN</span>
+                            <i data-lucide="camera" class="w-4 h-4 text-emerald-300"></i>
+                        </div>
+                        <p id="ui-pipe-1" class="text-xs text-slate-200 font-medium">Capture or upload label</p>
+                    </div>
+
+                    <!-- Step 2: EXTRACT -->
+                    <div id="step-2" class="pipeline-step glass-card rounded-2xl p-3.5 opacity-75">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-[11px] font-extrabold tracking-widest uppercase text-cyan-300">02 • EXTRACT</span>
+                            <i data-lucide="file-text" class="w-4 h-4 text-cyan-300"></i>
+                        </div>
+                        <p id="ui-pipe-2" class="text-xs text-slate-300 font-medium">OCR extracts printed text</p>
+                    </div>
+
+                    <!-- Step 3: ANALYSE -->
+                    <div id="step-3" class="pipeline-step glass-card rounded-2xl p-3.5 opacity-75">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-[11px] font-extrabold tracking-widest uppercase text-indigo-300">03 • ANALYSE</span>
+                            <i data-lucide="cpu" class="w-4 h-4 text-indigo-300"></i>
+                        </div>
+                        <p id="ui-pipe-3" class="text-xs text-slate-300 font-medium">Identify additives & allergens</p>
+                    </div>
+
+                    <!-- Step 4: EXPLAIN -->
+                    <div id="step-4" class="pipeline-step glass-card rounded-2xl p-3.5 opacity-75">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-[11px] font-extrabold tracking-widest uppercase text-amber-300">04 • EXPLAIN</span>
+                            <i data-lucide="volume-2" class="w-4 h-4 text-amber-300"></i>
+                        </div>
+                        <p id="ui-pipe-4" class="text-xs text-slate-300 font-medium">Simple multilingual output</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Core Workspace Grid: Left = Scanning Options & OCR Text | Right = Allergens, Additives & Multilingual TTS -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+            <!-- LEFT COLUMN (5 cols): Scanning Modes + Extracted OCR Text -->
+            <div class="lg:col-span-5 space-y-6">
+                
+                <!-- Scanning Options Panel -->
+                <div class="glass-panel rounded-3xl p-5 sm:p-6 space-y-5">
+                    <div class="flex items-center justify-between">
+                        <h2 id="ui-scan-heading" class="text-lg font-bold text-white flex items-center gap-2">
+                            <i data-lucide="scan" class="w-5 h-5 text-emerald-400"></i>
+                            <span>Label Input & Scanning</span>
+                        </h2>
+                        <span id="scan-status-pill" class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
+                            Ready
+                        </span>
+                    </div>
+
+                    <!-- Mode Switcher Tabs (Upload, Camera, Sample Presets) -->
+                    <div class="grid grid-cols-3 gap-1.5 sm:gap-2 p-1.5 rounded-2xl bg-slate-950/60 border border-white/10">
+                        <button id="tab-upload" onclick="switchScanTab('upload')" class="scan-tab active flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 py-2 px-1.5 sm:px-2 rounded-xl text-[11px] sm:text-xs font-bold bg-gradient-to-r from-sky-500/30 to-indigo-500/30 text-white border border-sky-400/40 shadow-sm transition text-center">
+                            <i data-lucide="upload-cloud" class="w-4 h-4 text-sky-300 shrink-0"></i>
+                            <span id="ui-tab-upload" class="leading-tight">Upload Image</span>
+                        </button>
+                        <button id="tab-camera" onclick="switchScanTab('camera')" class="scan-tab flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 py-2 px-1.5 sm:px-2 rounded-xl text-[11px] sm:text-xs font-semibold text-slate-300 hover:text-white transition text-center">
+                            <i data-lucide="camera" class="w-4 h-4 text-teal-300 shrink-0"></i>
+                            <span id="ui-tab-camera" class="leading-tight">Live Camera</span>
+                        </button>
+                        <button id="tab-samples" onclick="switchScanTab('samples')" class="scan-tab flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 py-2 px-1.5 sm:px-2 rounded-xl text-[11px] sm:text-xs font-semibold text-slate-300 hover:text-white transition text-center">
+                            <i data-lucide="layers-3" class="w-4 h-4 text-indigo-300 shrink-0"></i>
+                            <span id="ui-tab-samples" class="leading-tight">Sample Labels</span>
+                        </button>
+                    </div>
+
+                    <!-- TAB 1: Upload Label Image -->
+                    <div id="panel-upload" class="space-y-4">
+                        <div id="drop-zone" onclick="document.getElementById('file-input').click()" class="relative border-2 border-dashed border-white/25 hover:border-emerald-400/60 rounded-2xl p-6 text-center cursor-pointer transition bg-white/[0.02] hover:bg-emerald-500/[0.05] group overflow-hidden min-h-[210px] flex flex-col items-center justify-center">
+                            <input type="file" id="file-input" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
+                            
+                            <!-- Scanning Laser Overlay (Hidden until scanning) -->
+                            <div id="upload-laser" class="scanner-laser hidden"></div>
+
+                            <!-- Preview Image -->
+                            <img id="uploaded-preview" src="" alt="Uploaded Food Label Preview" class="hidden max-h-44 rounded-xl object-contain mx-auto mb-3 shadow-lg border border-white/20">
+
+                            <div id="upload-placeholder" class="space-y-2.5">
+                                <div class="w-12 h-12 rounded-2xl bg-emerald-500/15 border border-emerald-400/30 flex items-center justify-center mx-auto group-hover:scale-110 transition">
+                                    <i data-lucide="image-plus" class="w-6 h-6 text-emerald-300"></i>
+                                </div>
+                                <p id="ui-drop-title" class="text-sm font-semibold text-white">
+                                    Drop food label image here or click to browse
+                                </p>
+                                <p id="ui-drop-sub" class="text-xs text-slate-400">
+                                    Supports JPG, PNG, WEBP • High-contrast ingredient list recommended
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-2">
+                            <button onclick="simulateOCRFromImage()" class="flex-1 py-3 px-4 rounded-2xl font-bold text-sm bg-gradient-to-r from-sky-400 to-teal-400 hover:from-sky-300 hover:to-teal-300 text-slate-950 shadow-lg shadow-sky-500/20 transition flex items-center justify-center gap-2">
+                                <i data-lucide="scan-text" class="w-4 h-4"></i>
+                                <span id="ui-btn-scan-img">Extract & Analyse Label</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- TAB 2: Live Camera Capture (WebRTC) -->
+                    <div id="panel-camera" class="hidden space-y-4">
+                        <div class="relative rounded-2xl overflow-hidden bg-slate-950/80 border border-white/15 aspect-video flex items-center justify-center">
+                            <video id="camera-video" autoplay playsinline muted class="w-full h-full object-cover hidden"></video>
+                            <canvas id="camera-canvas" class="hidden"></canvas>
+                            <div id="camera-laser" class="scanner-laser hidden"></div>
+
+                            <!-- Viewfinder Overlay -->
+                            <div id="camera-viewfinder" class="absolute inset-4 border-2 border-emerald-400/50 rounded-xl pointer-events-none hidden">
+                                <div class="absolute top-2 left-2 px-2 py-0.5 rounded bg-slate-950/70 text-[10px] font-mono text-emerald-300">
+                                    ALIGN INGREDIENTS INSIDE FRAME
+                                </div>
+                            </div>
+
+                            <!-- Camera Fallback / Start Prompt -->
+                            <div id="camera-placeholder" class="p-6 text-center space-y-3">
+                                <div class="w-12 h-12 rounded-2xl bg-cyan-500/15 border border-cyan-400/30 flex items-center justify-center mx-auto">
+                                    <i data-lucide="video" class="w-6 h-6 text-cyan-300"></i>
+                                </div>
+                                <p id="ui-cam-prompt" class="text-xs text-slate-300 max-w-xs mx-auto">
+                                    Enable your device camera to scan a packaged-food label in real time.
+                                </p>
+                                <button onclick="startCamera()" class="px-4 py-2 rounded-xl text-xs font-bold bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-200 border border-cyan-400/40 transition">
+                                    Start Live Camera
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-2">
+                            <button id="btn-capture-frame" onclick="captureCameraFrame()" class="flex-1 py-3 px-4 rounded-2xl font-bold text-sm bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-950 shadow-lg shadow-cyan-500/20 transition flex items-center justify-center gap-2">
+                                <i data-lucide="aperture" class="w-4 h-4"></i>
+                                <span id="ui-btn-capture">Capture & Scan Label</span>
+                            </button>
+                            <button onclick="stopCamera()" class="px-3.5 py-3 rounded-2xl glass-card text-slate-300 hover:text-white" title="Stop Camera">
+                                <i data-lucide="video-off" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- TAB 3: Quick Sample Labels Panel -->
+                    <div id="panel-samples" class="hidden space-y-3">
+                        <div class="rounded-2xl p-4 bg-slate-950/50 border border-white/15 space-y-2.5">
+                            <p id="ui-samples-hint" class="text-xs text-slate-300">
+                                Choose a packaged-food label preset below to run OCR extraction and ingredient analysis immediately:
+                            </p>
+                            <div class="space-y-2">
+                                <button onclick="loadPreset('hazelnut')" class="w-full text-left px-3.5 py-2.5 rounded-xl bg-white/5 hover:bg-emerald-500/20 border border-white/10 hover:border-emerald-400/40 transition flex items-center justify-between">
+                                    <span class="text-xs font-semibold text-white">🍫 Chocolate Hazelnut Spread</span>
+                                    <span class="text-[10px] px-2 py-0.5 rounded bg-rose-500/20 text-rose-200 border border-rose-400/30">Nuts • Milk • Soy</span>
+                                </button>
+                                <button onclick="loadPreset('masala')" class="w-full text-left px-3.5 py-2.5 rounded-xl bg-white/5 hover:bg-emerald-500/20 border border-white/10 hover:border-emerald-400/40 transition flex items-center justify-between">
+                                    <span class="text-xs font-semibold text-white">🌶️ Spicy Masala Potato Chips</span>
+                                    <span class="text-[10px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-200 border border-amber-400/30">INS 330 • INS 621</span>
+                                </button>
+                                <button onclick="loadPreset('granola')" class="w-full text-left px-3.5 py-2.5 rounded-xl bg-white/5 hover:bg-emerald-500/20 border border-white/10 hover:border-emerald-400/40 transition flex items-center justify-between">
+                                    <span class="text-xs font-semibold text-white">🥣 Oat & Almond Granola Bar</span>
+                                    <span class="text-[10px] px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-200 border border-cyan-400/30">Oats • Almonds • E322</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Extracted OCR Text Panel (Hidden until scan/upload completes) -->
+                <div id="ocr-result-panel" class="hidden glass-panel rounded-3xl p-5 sm:p-6 space-y-3.5">
+                    <div class="flex items-center justify-between">
+                        <h3 id="ui-ocr-heading" class="text-base font-bold text-white flex items-center gap-2">
+                            <i data-lucide="file-scan" class="w-4 h-4 text-cyan-400"></i>
+                            <span>Extracted Label Text (OCR)</span>
+                        </h3>
+                        <span class="text-[11px] font-medium text-slate-400">Editable</span>
+                    </div>
+
+                    <textarea id="ocr-textarea" rows="5" class="glass-input w-full rounded-2xl p-3.5 text-xs sm:text-sm leading-relaxed resize-y" placeholder="Scan a package, upload a label image, or pick a sample label to extract text here..."></textarea>
+
+                    <div class="flex items-center gap-2.5">
+                        <button id="ui-btn-reanalyse" onclick="runFullAnalysis(true, isExplanationRevealed)" class="flex-1 py-2.5 px-4 rounded-2xl font-bold text-xs sm:text-sm bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-200 border border-cyan-400/40 transition flex items-center justify-center gap-2">
+                            <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                            <span>Analyse Text Now</span>
+                        </button>
+                        <button onclick="clearOCRText()" class="px-3.5 py-2.5 rounded-2xl glass-card text-xs font-semibold text-slate-300 hover:text-white transition" title="Clear Text">
+                            Clear
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN (7 cols): Allergen Alerts, On-Demand Explanation & Ingredient Breakdown -->
+            <div class="lg:col-span-7 space-y-6">
+
+                <!-- 1. Declared Allergen Alert Card -->
+                <div id="allergen-card" class="glass-panel rounded-3xl p-5 sm:p-6 border-rose-500/40 space-y-3.5">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-9 h-9 rounded-xl bg-rose-500/20 border border-rose-400/40 flex items-center justify-center">
+                                <i data-lucide="alert-triangle" class="w-5 h-5 text-rose-300"></i>
+                            </div>
+                            <div>
+                                <h2 id="ui-allergen-heading" class="text-base sm:text-lg font-extrabold text-white">
+                                    Declared Allergen Alert
+                                </h2>
+                                <p id="ui-allergen-sub" class="text-xs text-slate-300">
+                                    High-visibility check for common food allergens
+                                </p>
+                            </div>
+                        </div>
+                        <span id="allergen-count-badge" class="px-3 py-1 rounded-full text-xs font-extrabold bg-rose-500/30 text-rose-100 border border-rose-400/50">
+                            3 Allergens Detected
+                        </span>
+                    </div>
+
+                    <div id="allergen-badges-container" class="flex flex-wrap gap-2.5 pt-1">
+                        <!-- Populated dynamically via JS -->
+                    </div>
+                </div>
+
+                <!-- 2. On-Demand Simplified Multilingual Explanation + Synchronized Voice-to-Text Output -->
+                <div class="glass-panel rounded-3xl p-5 sm:p-6 border-emerald-400/30 space-y-4">
+                    <div class="flex flex-wrap items-center justify-between gap-3">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center">
+                                <i data-lucide="sparkles" class="w-5 h-5 text-emerald-300"></i>
+                            </div>
+                            <div>
+                                <h2 id="ui-explain-heading" class="text-base sm:text-lg font-extrabold text-white">
+                                    Plain-Language Explanation & Voice-to-Text
+                                </h2>
+                                <p id="ui-explain-lang-tag" class="text-xs text-emerald-300 font-medium">
+                                    Available on demand in your selected language
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Explicit Trigger Button: Only reveals explanation when clicked -->
+                        <button id="btn-trigger-explain" onclick="revealExplanation()" class="px-4 py-2.5 rounded-2xl font-extrabold text-xs sm:text-sm bg-gradient-to-r from-sky-400 via-teal-400 to-indigo-300 hover:from-sky-300 hover:to-indigo-200 text-slate-950 shadow-lg shadow-sky-500/20 transition flex items-center gap-2">
+                            <i data-lucide="wand-2" class="w-4 h-4"></i>
+                            <span id="ui-btn-explain">Explain Ingredients & Label</span>
+                        </button>
+                    </div>
+
+                    <!-- Collapsed Placeholder Prompt (Shown until user clicks "Explain") -->
+                    <div id="explanation-locked-prompt" class="p-4 rounded-2xl bg-slate-950/45 border border-dashed border-white/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="flex items-start gap-3">
+                            <i data-lucide="lock-open" class="w-5 h-5 text-amber-300 shrink-0 mt-0.5"></i>
+                            <p id="ui-explain-prompt-text" class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                                Ingredients and allergens are analysed above. Click <strong>Explain Ingredients & Label</strong> whenever you want a simplified multilingual explanation and live Voice-to-Text caption readout.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Revealed Explanation & Synchronized Voice-to-Text Readout (Hidden initially) -->
+                    <div id="explanation-revealed-box" class="hidden space-y-4 pt-1">
+                        <!-- Plain-Language Summary Box -->
+                        <div class="p-4 sm:p-5 rounded-2xl bg-white/[0.06] border border-white/15 space-y-2.5">
+                            <div class="flex flex-wrap items-center justify-between gap-2">
+                                <span id="product-title-badge" class="text-xs font-extrabold uppercase tracking-wider text-cyan-300">
+                                    Chocolate Hazelnut Spread
+                                </span>
+                                <span id="dietary-badge" class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-500/20 text-amber-200 border border-amber-400/30">
+                                    High Sugar & Fat • Contains Dairy/Nuts
+                                </span>
+                            </div>
+                            <p id="simplified-summary-text" class="text-sm sm:text-base text-slate-100 leading-relaxed font-normal">
+                                <!-- Populated dynamically in selected language -->
+                            </p>
+                        </div>
+
+                        <!-- Voice-to-Text Synchronized Audio Readout & Live Caption Stream -->
+                        <div class="p-4 rounded-2xl bg-slate-950/60 border border-emerald-400/30 space-y-3">
+                            <div class="flex flex-wrap items-center justify-between gap-3">
+                                <div class="flex items-center gap-2.5">
+                                    <div id="tts-wave-indicator" class="wave-paused flex items-center gap-1 px-2 py-1 rounded-lg bg-emerald-500/15 border border-emerald-400/30">
+                                        <span class="wave-bar"></span>
+                                        <span class="wave-bar"></span>
+                                        <span class="wave-bar"></span>
+                                        <span class="wave-bar"></span>
+                                    </div>
+                                    <div>
+                                        <span id="ui-vtt-title" class="text-xs font-extrabold uppercase tracking-wider text-emerald-300 block">
+                                            Voice-to-Text Audio & Live Subtitles
+                                        </span>
+                                        <span id="ui-vtt-sub" class="text-[11px] text-slate-400">
+                                            Listens aloud while streaming live synchronized text captions
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- Audio Playback Controls -->
+                                <div class="flex items-center gap-2">
+                                    <button id="btn-tts-play" onclick="toggleTTS()" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-xs flex items-center gap-1.5 shadow-md transition">
+                                        <i data-lucide="volume-2" class="w-4 h-4"></i>
+                                        <span id="ui-btn-listen">Play Voice & Text</span>
+                                    </button>
+                                    <button onclick="stopTTS()" class="p-2 rounded-xl text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition" title="Stop Audio">
+                                        <i data-lucide="square" class="w-3.5 h-3.5"></i>
+                                    </button>
+                                    <button id="btn-tts-rate" onclick="cycleTTSRate()" class="px-2.5 py-1.5 rounded-xl text-[11px] font-bold text-amber-300 bg-white/5 hover:bg-white/10 border border-white/10 transition" title="Speech Speed">
+                                        1.0x
+                                    </button>
+                        <span id="allergen-count-badge" class="px-3 py-1 rounded-full text-xs font-extrabold bg-slate-500/25 text-slate-200 border border-slate-400/40">
+                            Awaiting Scan
+                        </span>
+                    </div>
+
+                    <div id="allergen-badges-container" class="flex flex-wrap gap-2.5 pt-1">
+                        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-white/5 border border-white/10 text-slate-300 text-xs font-medium">
+                            <i data-lucide="scan-line" class="w-4 h-4 text-sky-400"></i>
+                            <span>Scan or upload a food label first to detect allergens.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Ingredient & Additive Breakdown -->
+                <div class="glass-panel rounded-3xl p-5 sm:p-6 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 id="ui-breakdown-heading" class="text-base sm:text-lg font-extrabold text-white flex items-center gap-2">
+                                <i data-lucide="layers" class="w-5 h-5 text-indigo-400"></i>
+                                <span>Ingredient & Additive Breakdown</span>
+                            </h2>
+                            <p id="ui-breakdown-sub" class="text-xs text-slate-300">
+                                Technical terms and INS/E-numbers decoded into everyday language
+                            </p>
+                        </div>
+                        <span id="ingredient-count-pill" class="px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-500/20 text-indigo-200 border border-indigo-400/30">
+                            0 Items
+                        </span>
+                    </div>
+
+                    <div id="ingredients-list" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="col-span-full p-4 rounded-2xl bg-white/5 border border-dashed border-white/15 text-xs text-slate-300 text-center">
+                            No label scanned yet. Capture a photo, upload an image, or choose a sample preset to extract and decode ingredients.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pitch Deck Section: Who This System Helps -->
+        <section class="space-y-4 pt-4">
+            <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
+                <div>
+                    <span class="text-xs font-extrabold uppercase tracking-widest text-emerald-400">Inclusive Food Literacy</span>
+                    <h2 id="ui-who-heading" class="text-xl sm:text-2xl font-extrabold text-white">Who This System Helps</h2>
+                </div>
+                <p id="ui-who-sub" class="text-xs sm:text-sm text-slate-300">
+                    Making small, crowded, and technical food labels accessible to everyone.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="glass-card rounded-3xl p-5 space-y-3">
+                    <div class="w-11 h-11 rounded-2xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-300">
+                        <i data-lucide="glasses" class="w-5 h-5"></i>
+                    </div>
+                    <h3 id="ui-who-1-t" class="font-bold text-white text-base">Elderly People</h3>
+                    <p id="ui-who-1-d" class="text-xs text-slate-300 leading-relaxed">
+                        Overcomes tiny, crowded print on packaging with large readable cards and optional Text-to-Speech audio playback.
+                    </p>
+                </div>
+
+                <div class="glass-card rounded-3xl p-5 space-y-3">
+                    <div class="w-11 h-11 rounded-2xl bg-cyan-500/20 border border-cyan-400/30 flex items-center justify-center text-cyan-300">
+                        <i data-lucide="globe" class="w-5 h-5"></i>
+                    </div>
+                    <h3 id="ui-who-2-t" class="font-bold text-white text-base">Limited-English Users</h3>
+                    <p id="ui-who-2-d" class="text-xs text-slate-300 leading-relaxed">
+                        Breaks language barriers by translating unfamiliar English ingredient lists into native regional and global languages.
+                    </p>
+                </div>
+
+                <div class="glass-card rounded-3xl p-5 space-y-3">
+                    <div class="w-11 h-11 rounded-2xl bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center text-indigo-300">
+                        <i data-lucide="book-open-check" class="w-5 h-5"></i>
+                    </div>
+                    <h3 id="ui-who-3-t" class="font-bold text-white text-base">Low Food-Label Literacy</h3>
+                    <p id="ui-who-3-d" class="text-xs text-slate-300 leading-relaxed">
+                        Converts complex chemical names and E-numbers (like emulsifiers & acidity regulators) into simple everyday words.
+                    </p>
+                </div>
+
+                <div class="glass-card rounded-3xl p-5 space-y-3">
+                    <div class="w-11 h-11 rounded-2xl bg-rose-500/20 border border-rose-400/30 flex items-center justify-center text-rose-300">
+                        <i data-lucide="shield-alert" class="w-5 h-5"></i>
+                    </div>
+                    <h3 id="ui-who-4-t" class="font-bold text-white text-base">Allergy & Dietary Checking</h3>
+                    <p id="ui-who-4-d" class="text-xs text-slate-300 leading-relaxed">
+                        Instantly flags declared allergens (nuts, dairy, soy, gluten) so shoppers can make safe decisions before buying.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pitch Deck Section: How It Works (01 -> 02 -> 03 -> 04) -->
+        <section id="how-it-works" class="glass-panel rounded-3xl p-6 sm:p-8 space-y-6">
+            <div class="text-center max-w-2xl mx-auto space-y-1.5">
+                <span class="text-xs font-extrabold uppercase tracking-widest text-cyan-400">Simple 4-Step Experience</span>
+                <h2 id="ui-how-heading" class="text-xl sm:text-2xl font-extrabold text-white">How a User Uses the Label Assistant</h2>
+                <p id="ui-how-sub" class="text-xs sm:text-sm text-slate-300">
+                    SCAN • UNDERSTAND • CHOOSE
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="glass-card rounded-2xl p-5 relative">
+                    <span class="text-3xl font-black text-emerald-400/25 absolute top-3 right-4">01</span>
+                    <div class="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-300 flex items-center justify-center mb-3">
+                        <i data-lucide="languages" class="w-5 h-5"></i>
+                    </div>
+                    <h3 id="ui-how-1-t" class="font-bold text-white text-sm mb-1">Open & Choose Language</h3>
+                    <p id="ui-how-1-d" class="text-xs text-slate-300 leading-relaxed">
+                        Select your preferred language from the top bar for tailored explanations and voice output.
+                    </p>
+                </div>
+
+                <div class="glass-card rounded-2xl p-5 relative">
+                    <span class="text-3xl font-black text-cyan-400/25 absolute top-3 right-4">02</span>
+                    <div class="w-9 h-9 rounded-xl bg-cyan-500/20 text-cyan-300 flex items-center justify-center mb-3">
+                        <i data-lucide="scan-line" class="w-5 h-5"></i>
+                    </div>
+                    <h3 id="ui-how-2-t" class="font-bold text-white text-sm mb-1">Scan the Package</h3>
+                    <p id="ui-how-2-d" class="text-xs text-slate-300 leading-relaxed">
+                        Capture a photo with your camera, upload a clear label image, or speak ingredients aloud.
+                    </p>
+                </div>
+
+                <div class="glass-card rounded-2xl p-5 relative">
+                    <span class="text-3xl font-black text-indigo-400/25 absolute top-3 right-4">03</span>
+                    <div class="w-9 h-9 rounded-xl bg-indigo-500/20 text-indigo-300 flex items-center justify-center mb-3">
+                        <i data-lucide="search-check" class="w-5 h-5"></i>
+                    </div>
+                    <h3 id="ui-how-3-t" class="font-bold text-white text-sm mb-1">Review the Analysis</h3>
+                    <p id="ui-how-3-d" class="text-xs text-slate-300 leading-relaxed">
+                        OCR extracts printed text and checks recognized ingredients, additives, and declared allergens.
+                    </p>
+                </div>
+
+                <div class="glass-card rounded-2xl p-5 relative">
+                    <span class="text-3xl font-black text-amber-400/25 absolute top-3 right-4">04</span>
+                    <div class="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-300 flex items-center justify-center mb-3">
+                        <i data-lucide="headphones" class="w-5 h-5"></i>
+                    </div>
+                    <h3 id="ui-how-4-t" class="font-bold text-white text-sm mb-1">Tap Explain & Listen</h3>
+                    <p id="ui-how-4-d" class="text-xs text-slate-300 leading-relaxed">
+                        Click Explain on demand to read the simplified summary or stream Voice-to-Text synchronized audio captions.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer with Pitch Deck Disclaimer -->
+    <footer class="glass-panel border-x-0 border-b-0 rounded-none py-6 px-4 sm:px-8">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+            <div class="flex items-center gap-2.5">
+                <i data-lucide="info" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+                <p id="ui-disclaimer" class="text-xs text-slate-300">
+                    <strong>Important Note:</strong> Designed to make label information easier to understand—not replace the physical package label.
+                </p>
+            </div>
+            <div class="text-xs font-semibold text-slate-400">
+                Stage 2 Prototype • <span class="text-emerald-300">SCAN • UNDERSTAND • CHOOSE</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Application Logic -->
+    <script>
+        // =========================================================================
+        // 1. MULTILINGUAL DICTIONARY (UI + SIMPLIFIED EXPLANATIONS)
+        // =========================================================================
+        const UI_TRANSLATIONS = {
+            en: {
+                langName: "English",
+                speechCode: "en-US",
+                headerTitle: "Multilingual Intelligent Food Safety & Ingredient Analysis",
+                tagline: "Understand the label. Make an informed choice.",
+                heroBadge: "Intelligent Food Safety & Ingredient Analysis System",
+                heroTitle: "Turn complex food labels into clear, everyday explanations.",
+                heroSubtitle: "Scan a package label or upload an image to instantly spot declared allergens and decode additives—then tap Explain whenever you want a simplified summary with live Voice-to-Text captions.",
+                pipe1: "Capture or upload label",
+                pipe2: "OCR extracts printed text",
+                pipe3: "Identify additives & allergens",
+                pipe4: "Tap Explain for simple output",
+                scanHeading: "Label Input & Scanning",
+                tabUpload: "Upload Image",
+                tabCamera: "Live Camera",
+                tabSamples: "Sample Labels",
+                dropTitle: "Drop food label image here or click to browse",
+                btnScanImg: "Extract & Analyse Label",
+                btnCapture: "Capture & Scan Label",
+                ocrHeading: "Extracted Label Text (OCR)",
+                btnReanalyse: "Analyse Text Now",
+                allergenHeading: "Declared Allergen Alert",
+                allergenSub: "High-visibility check for common food allergens",
+                explainHeading: "Plain-Language Explanation & Voice-to-Text",
+                explainLangTag: "Available on demand in English",
+                btnExplain: "Explain Ingredients & Label",
+                explainPrompt: "Ingredients and allergens are analysed above. Click Explain Ingredients & Label whenever you want a simplified multilingual explanation and live Voice-to-Text caption readout.",
+                btnListen: "Play Voice & Text",
+                breakdownHeading: "Ingredient & Additive Breakdown",
+                breakdownSub: "Technical terms and INS/E-numbers decoded into everyday language",
+                disclaimer: "Designed to make label information easier to understand—not replace the physical package label.",
+                noAllergens: "No common declared allergens detected in scanned text."
+            },
+            hi: {
+                langName: "हिन्दी (Hindi)",
+                speechCode: "hi-IN",
+                headerTitle: "बहुभाषी बुद्धिमान खाद्य सुरक्षा और सामग्री विश्लेषण",
+                tagline: "लेबल को समझें। सही और सुरक्षित विकल्प चुनें।",
+                heroBadge: "बहुभाषी बुद्धिमान खाद्य सुरक्षा और सामग्री विश्लेषण प्रणाली",
+                heroTitle: "जटिल फूड लेबल को आसान और स्पष्ट भाषा में समझें।",
+                heroSubtitle: "पैकेट का लेबल स्कैन करें या फोटो अपलोड करें—एलर्जी और एडिटिव्स की तुरंत जांच करें, और सरल व्याख्या के लिए 'व्याख्या करें' दबाएं।",
+                pipe1: "लेबल स्कैन या अपलोड करें",
+                pipe2: "OCR द्वारा टेक्स्ट निकालें",
+                pipe3: "एलर्जी और एडिटिव्स की पहचान",
+                pipe4: "व्याख्या बटन दबाकर समझें",
+                scanHeading: "लेबल इनपुट और स्कैनिंग",
+                tabUpload: "फोटो अपलोड",
+                tabCamera: "लाइव कैमरा",
+                tabSamples: "सैंपल लेबल",
+                dropTitle: "फूड लेबल की फोटो यहाँ डालें या चुनें",
+                btnScanImg: "टेक्स्ट निकालें और विश्लेषण करें",
+                btnCapture: "फोटो खींचें और स्कैन करें",
+                ocrHeading: "निकाला गया लेबल टेक्स्ट (OCR)",
+                btnReanalyse: "अभी विश्लेषण करें",
+                allergenHeading: "घोषित एलर्जी चेतावनी (Allergen Alert)",
+                allergenSub: "प्रमुख खाद्य एलर्जी कारकों की त्वरित जांच",
+                explainHeading: "सरल भाषा में व्याख्या और वॉइस-टू-टेक्स्ट",
+                explainLangTag: "हिन्दी में उपलब्ध (देखने के लिए बटन दबाएं)",
+                btnExplain: "सरल व्याख्या दिखाएं (Explain)",
+                explainPrompt: "सामग्री और एलर्जी का विश्लेषण ऊपर हो चुका है। सरल भाषा में सारांश और लाइव वॉइस-टू-टेक्स्ट कैप्शन देखने के लिए 'सरल व्याख्या दिखाएं' दबाएं।",
+                btnListen: "आवाज़ और टेक्स्ट चलाएं",
+                breakdownHeading: "सामग्री और एडिटिव्स का विवरण",
+                breakdownSub: "तकनीकी नामों और E-नंबरों का सरल अर्थ",
+                disclaimer: "यह जानकारी लेबल को समझने में मदद करने के लिए है—पैकेट के मूल लेबल का विकल्प नहीं है।",
+                noAllergens: "स्कैन किए गए टेक्स्ट में कोई सामान्य घोषित एलर्जी नहीं मिली।"
+            },
+            kn: {
+                langName: "ಕನ್ನಡ (Kannada)",
+                speechCode: "kn-IN",
+                headerTitle: "ಬಹುಭಾಷಾ ಬುದ್ಧಿವಂತ ಆಹಾರ ಸುರಕ್ಷತೆ ಮತ್ತು ಪದಾರ್ಥಗಳ ವಿಶ್ಲೇಷಣೆ",
+                tagline: "ಲೇಬಲ್ ಅರ್ಥಮಾಡಿಕೊಳ್ಳಿ. ಸರಿಯಾದ ಆಯ್ಕೆ ಮಾಡಿ.",
+                heroBadge: "ಬಹುಭಾಷಾ ಬುದ್ಧಿವಂತ ಆಹಾರ ಸುರಕ್ಷತೆ ಮತ್ತು ಪದಾರ್ಥಗಳ ವಿಶ್ಲೇಷಣೆ",
+                heroTitle: "ಸಂಕೀರ್ಣ ಆಹಾರ ಲೇಬಲ್‌ಗಳನ್ನು ಸರಳ ಭಾಷೆಯಲ್ಲಿ ಅರ್ಥಮಾಡಿಕೊಳ್ಳಿ.",
+                heroSubtitle: "ಪ್ಯಾಕೇಜ್ ಲೇಬಲ್ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ ಅಥವಾ ಚಿತ್ರ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ—ಅಲರ್ಜಿ ಮತ್ತು ಪದಾರ್ಥಗಳನ್ನು ತಿಳಿಯಿರಿ, ಮತ್ತು ಸರಳ ವಿವರಣೆಗಾಗಿ 'ವಿವರಿಸಿ' ಒತ್ತಿರಿ.",
+                pipe1: "ಲೇಬಲ್ ಸ್ಕ್ಯಾನ್ ಅಥವಾ ಅಪ್‌ಲೋಡ್",
+                pipe2: "OCR ಮೂಲಕ ಪಠ್ಯ ಪಡೆಯಿರಿ",
+                pipe3: "ಅಲರ್ಜಿ ಮತ್ತು ಸಂಯೋಜಕಗಳ ಪತ್ತೆ",
+                pipe4: "ವಿವರಣೆಗಾಗಿ ಬಟನ್ ಒತ್ತಿರಿ",
+                scanHeading: "ಲೇಬಲ್ ಇನ್‌ಪುಟ್ ಮತ್ತು ಸ್ಕ್ಯಾನಿಂಗ್",
+                tabUpload: "ಚಿತ್ರ ಅಪ್‌ಲೋಡ್",
+                tabCamera: "ಲೈವ್ ಕ್ಯಾಮೆರಾ",
+                tabSamples: "ಮಾದರಿ ಲೇಬಲ್‌ಗಳು",
+                dropTitle: "ಆಹಾರ ಲೇಬಲ್ ಚಿತ್ರವನ್ನು ಇಲ್ಲಿ ಹಾಕಿ ಅಥವಾ ಆಯ್ಕೆಮಾಡಿ",
+                btnScanImg: "ಪಠ್ಯ ತೆಗೆದು ವಿಶ್ಲೇಷಿಸಿ",
+                btnCapture: "ಚಿತ್ರ ತೆಗೆದು ಸ್ಕ್ಯಾನ್ ಮಾಡಿ",
+                ocrHeading: "ತೆಗೆದ ಲೇಬಲ್ ಪಠ್ಯ (OCR)",
+                btnReanalyse: "ಈಗ ವಿಶ್ಲೇಷಿಸಿ",
+                allergenHeading: "ಅಲರ್ಜಿ ಎಚ್ಚರಿಕೆ (Allergen Alert)",
+                allergenSub: "ಸಾಮಾನ್ಯ ಆಹಾರ ಅಲರ್ಜಿಗಳ ತಕ್ಷಣದ ಪರಿಶೀಲನೆ",
+                explainHeading: "ಸರಳ ವಿವರಣೆ ಮತ್ತು ವಾಯ್ಸ್-ಟು-ಟೆಕ್ಸ್ಟ್",
+                explainLangTag: "ಕನ್ನಡದಲ್ಲಿ ಲಭ್ಯವಿದೆ (ನೋಡಲು ಬಟನ್ ಒತ್ತಿರಿ)",
+                btnExplain: "ಪದಾರ್ಥಗಳನ್ನು ವಿವರಿಸಿ (Explain)",
+                explainPrompt: "ಪದಾರ್ಥಗಳು ಮತ್ತು ಅಲರ್ಜಿಗಳನ್ನು ಮೇಲೆ ವಿಶ್ಲೇಷಿಸಲಾಗಿದೆ. ಸರಳ ವಿವರಣೆ ಮತ್ತು ಲೈವ್ ವಾಯ್ಸ್-ಟು-ಟೆಕ್ಸ್ಟ್ ಶೀರ್ಷಿಕೆಗಳಿಗಾಗಿ 'ಪದಾರ್ಥಗಳನ್ನು ವಿವರಿಸಿ' ಒತ್ತಿರಿ.",
+                btnListen: "ಧ್ವನಿ ಮತ್ತು ಪಠ್ಯ ಆಲಿಸಿ",
+                breakdownHeading: "ಪದಾರ್ಥಗಳು ಮತ್ತು ಸಂಯೋಜಕಗಳ ವಿವರ",
+                breakdownSub: "ತಾಂತ್ರಿಕ ಪದಗಳು ಮತ್ತು E-ಸಂಖ್ಯೆಗಳ ಸರಳ ಅರ್ಥ",
+                disclaimer: "ಲೇಬಲ್ ಮಾಹಿತಿಯನ್ನು ಸುಲಭವಾಗಿ ಅರ್ಥಮಾಡಿಕೊಳ್ಳಲು ವಿನ್ಯಾಸಗೊಳಿಸಲಾಗಿದೆ—ಪ್ಯಾಕೇಜ್ ಲೇಬಲ್‌ಗೆ ಬದಲಿಯಾಗಿಲ್ಲ.",
+                noAllergens: "ಸ್ಕ್ಯಾನ್ ಮಾಡಿದ ಪಠ್ಯದಲ್ಲಿ ಯಾವುದೇ ಸಾಮಾನ್ಯ ಅಲರ್ಜಿಗಳು ಕಂಡುಬಂದಿಲ್ಲ."
+            },
+            bn: {
+                langName: "বাংলা (Bengali)",
+                speechCode: "bn-IN",
+                headerTitle: "বহুভাষিক বুদ্ধিমান খাদ্য নিরাপত্তা ও উপাদান বিশ্লেষণ",
+                tagline: "লেবেল বুঝুন। সঠিক ও নিরাপদ সিদ্ধান্ত নিন।",
+                heroBadge: "বহুভাষিক বুদ্ধিমান খাদ্য নিরাপত্তা ও উপাদান বিশ্লেষণ ব্যবস্থা",
+                heroTitle: "জটিল খাবারের লেবেলকে সহজ ও পরিষ্কার ভাষায় বুঝুন।",
+                heroSubtitle: "প্যাকেটের লেবেল স্ক্যান করুন বা ছবি আপলোড করুন—অ্যালার্জি ও অ্যাডিটিভস তাৎক্ষণিক দেখুন এবং সহজ ব্যাখ্যার জন্য 'ব্যাখ্যা করুন' চাপুন।",
+                pipe1: "লেবেল স্ক্যান বা আপলোড করুন",
+                pipe2: "OCR ছাপানো লেখা বের করে",
+                pipe3: "অ্যালার্জি ও অ্যাডিটিভস শনাক্তকরণ",
+                pipe4: "সহজ ব্যাখ্যার জন্য বাটন চাপুন",
+                scanHeading: "লেবেল ইনপুট ও স্ক্যানিং",
+                tabUpload: "ছবি আপলোড",
+                tabCamera: "লাইভ ক্যামেরা",
+                tabSamples: "নমুনা লেবেল",
+                dropTitle: "খাবারের লেবেলের ছবি এখানে দিন বা বেছে নিন",
+                btnScanImg: "লেখা বের করে বিশ্লেষণ করুন",
+                btnCapture: "ছবি তুলুন ও স্ক্যান করুন",
+                ocrHeading: "সংগৃহীত লেবেল টেক্সট (OCR)",
+                btnReanalyse: "এখনই বিশ্লেষণ করুন",
+                allergenHeading: "ঘোষিত অ্যালার্জি সতর্কতা",
+                allergenSub: "সাধারণ খাদ্য অ্যালার্জির দ্রুত পরীক্ষা",
+                explainHeading: "সহজ ভাষায় ব্যাখ্যা ও ভয়েস-টু-টেক্সট",
+                explainLangTag: "বাংলায় উপলব্ধ (দেখতে বাটন চাপুন)",
+                btnExplain: "উপাদান ব্যাখ্যা করুন (Explain)",
+                explainPrompt: "উপাদান ও অ্যালার্জি উপরে বিশ্লেষণ করা হয়েছে। সহজ সারসংক্ষেপ ও লাইভ ভয়েস-টু-টেক্সট দেখতে 'উপাদান ব্যাখ্যা করুন' চাপুন।",
+                btnListen: "ভয়েস ও টেক্সট শুনুন",
+                breakdownHeading: "উপাদান ও অ্যাডিটিভসের বিবরণ",
+                breakdownSub: "প্রযুক্তিগত শব্দ ও E-নম্বরের সহজ অর্থ",
+                disclaimer: "লেবেলের তথ্য সহজে বোঝার জন্য তৈরি—প্যাকেটের মূল লেবেলের বিকল্প নয়।",
+                noAllergens: "স্ক্যান করা লেখায় কোনো সাধারণ অ্যালার্জি পাওয়া যায়নি।"
+            },
+            mr: {
+                langName: "मराठी (Marathi)",
+                speechCode: "mr-IN",
+                headerTitle: "बहुभाषिक बुद्धिमान अन्न सुरक्षा आणि घटक विश्लेषण",
+                tagline: "लेबल समजून घ्या. योग्य आणि सुरक्षित निवड करा.",
+                heroBadge: "बहुभाषिक बुद्धिमान अन्न सुरक्षा आणि घटक विश्लेषण प्रणाली",
+                heroTitle: "क्लिष्ट फूड लेबल्स सोप्या आणि स्पष्ट भाषेत समजून घ्या.",
+                heroSubtitle: "पॅकेटचे लेबल स्कॅन करा किंवा फोटो अपलोड करा—अॅलर्जी आणि घटक त्वरित पहा, आणि सोप्या स्पष्टीकरणासाठी 'स्पष्ट करा' दाबा.",
+                pipe1: "लेबल स्कॅन किंवा अपलोड करा",
+                pipe2: "OCR द्वारे मजकूर काढा",
+                pipe3: "अॅलर्जी आणि घटक ओळखा",
+                pipe4: "स्पष्टीकरणासाठी बटण दाबा",
+                scanHeading: "लेबल इनपुट आणि स्कॅनिंग",
+                tabUpload: "फोटो अपलोड",
+                tabCamera: "लाइव्ह कॅमेरा",
+                tabSamples: "नमुना लेबल्स",
+                dropTitle: "फूड लेबलचा फोटो येथे टाका किंवा निवडा",
+                btnScanImg: "मजकूर काढा आणि विश्लेषण करा",
+                btnCapture: "फोटो काढा आणि स्कॅन करा",
+                ocrHeading: "काढलेला लेबल मजकूर (OCR)",
+                btnReanalyse: "आता विश्लेषण करा",
+                allergenHeading: "घोषित अॅलर्जी इशारा (Allergen Alert)",
+                allergenSub: "सामान्य अन्न अॅलर्जीची त्वरित तपासणी",
+                explainHeading: "सोप्या भाषेत स्पष्टीकरण आणि व्हॉइस-टू-टेक्स्ट",
+                explainLangTag: "मराठीत उपलब्ध (पाहण्यासाठी बटण दाबा)",
+                btnExplain: "घटक स्पष्ट करा (Explain)",
+                explainPrompt: "घटक आणि अॅलर्जीचे विश्लेषण वर केले आहे. सोपा सारांश आणि लाइव्ह व्हॉइस-टू-टेक्स्ट पाहण्यासाठी 'घटक स्पष्ट करा' दाबा.",
+                btnListen: "आवाज आणि मजकूर ऐका",
+                breakdownHeading: "घटक आणि अॅडिटिव्हजचा तपशील",
+                breakdownSub: "तांत्रिक नावे आणि E-नंबर्सचा सोपा अर्थ",
+                disclaimer: "लेबलची माहिती समजणे सोपे व्हावे यासाठी तयार केले आहे—पॅकेटच्या मूळ लेबलला पर्याय नाही.",
+                noAllergens: "स्कॅन केलेल्या मजकुरात कोणतीही सामान्य अॅलर्जी आढळली नाही."
+            },
+            tcy: {
+                langName: "ತುಳು (Tulu)",
+                speechCode: "kn-IN",
+                headerTitle: "ಬಹುಭಾಷಾ ಬುದ್ಧಿವಂತ ಆಹಾರ ಸುರಕ್ಷತೆ ಬೊಕ್ಕ ವಸ್ತುಲೆನ ವಿಶ್ಲೇಷಣೆ",
+                tagline: "ಲೇಬಲ್ ಅರ್ಥ ಮಲ್ಪುಲೆ. ಸರಿ ಆಯ್ಕೆ ಮಲ್ಪುಲೆ.",
+                heroBadge: "ಬಹುಭಾಷಾ ಬುದ್ಧಿವಂತ ಆಹಾರ ಸುರಕ್ಷತೆ ಬೊಕ್ಕ ವಸ್ತುಲೆನ ವಿಶ್ಲೇಷಣೆ",
+                heroTitle: "ಕಷ್ಟದ ಆಹಾರ ಲೇಬಲ್‌ಲೆನ್ ಸುಲಭ ಬಾಸೆಡ್ ಅರ್ಥ ಮಲ್ಪುಲೆ.",
+                heroSubtitle: "ಪ್ಯಾಕೆಟ್ ಲೇಬಲ್ ಸ್ಕ್ಯಾನ್ ಮಲ್ಪುಲೆ ಅತ್ತಂಡ ಫೋಟೋ ಪಾಡ್ಲೆ—ಅಲರ್ಜಿ ಬೊಕ್ಕ ವಸ್ತುಲೆನ್ ತೂಲೆ, ಬೊಕ್ಕ ಸುಲಭ ವಿವರಣೆಗ್ 'ವಿವರಿಸಾಲೆ' ಒತ್ತುಲೆ.",
+                pipe1: "ಲೇಬಲ್ ಸ್ಕ್ಯಾನ್ ಅತ್ತಂಡ ಅಪ್‌ಲೋಡ್",
+                pipe2: "OCR ಮೂಲಕ ಬರವು ದೆಪ್ಪುಲೆ",
+                pipe3: "ಅಲರ್ಜಿ ಬೊಕ್ಕ ವಸ್ತುಲೆನ ಗುರುತು",
+                pipe4: "ವಿವರಣೆಗ್ ಬಟನ್ ಒತ್ತುಲೆ",
+                scanHeading: "ಲೇಬಲ್ ಇನ್‌ಪುಟ್ ಬೊಕ್ಕ ಸ್ಕ್ಯಾನಿಂಗ್",
+                tabUpload: "ಚಿತ್ರ ಅಪ್‌ಲೋಡ್",
+                tabCamera: "ಲೈವ್ ಕ್ಯಾಮೆರಾ",
+                tabSamples: "ಮಾದರಿ ಲೇಬಲ್‌ಲು",
+                dropTitle: "ಆಹಾರ ಲೇಬಲ್ ಚಿತ್ರೊನು ಇಡೆ ಪಾಡ್ಲೆ ಅತ್ತಂಡ ಆಯ್ಕೆ ಮಲ್ಪುಲೆ",
+                btnScanImg: "ಬರವು ದೆತ್ತ್‌ದ್ ವಿಶ್ಲೇಷಣೆ ಮಲ್ಪುಲೆ",
+                btnCapture: "ಚಿತ್ರ ದೆತ್ತ್‌ದ್ ಸ್ಕ್ಯಾನ್ ಮಲ್ಪುಲೆ",
+                ocrHeading: "ದೆತ್ತಿನ ಲೇಬಲ್ ಬರವು (OCR)",
+                btnReanalyse: "ಇತ್ತೆ ವಿಶ್ಲೇಷಣೆ ಮಲ್ಪುಲೆ",
+                allergenHeading: "ಅಲರ್ಜಿ ಎಚ್ಚರಿಕೆ (Allergen Alert)",
+                allergenSub: "ಸಾಮಾನ್ಯ ಆಹಾರ ಅಲರ್ಜಿಲೆನ ತಕ್ಷಣದ ಪರಿಶೀಲನೆ",
+                explainHeading: "ಸುಲಭ ವಿವರಣೆ ಬೊಕ್ಕ ವಾಯ್ಸ್-ಟು-ಟೆಕ್ಸ್ಟ್",
+                explainLangTag: "ತುಳುಟು ಲಭ್ಯ ಉಂಡು (ತೂಯೆರೆ ಬಟನ್ ಒತ್ತುಲೆ)",
+                btnExplain: "ವಸ್ತುಲೆನ್ ವಿವರಿಸಾಲೆ (Explain)",
+                explainPrompt: "ವಸ್ತುಲು ಬೊಕ್ಕ ಅಲರ್ಜಿಲೆನ್ ಮಿತ್ತ್ ವಿಶ್ಲೇಷಣೆ ಮಲ್ತ್‌ದ್ಂಡ್. ಸುಲಭ ವಿವರಣೆ ಬೊಕ್ಕ ಲೈವ್ ವಾಯ್ಸ್-ಟು-ಟೆಕ್ಸ್ಟ್ ಬರವುಗು 'ವಸ್ತುಲೆನ್ ವಿವರಿಸಾಲೆ' ಒತ್ತುಲೆ.",
+                btnListen: "ಸ್ವರ ಬೊಕ್ಕ ಬರವು ಕೇನ್ಲೆ",
+                breakdownHeading: "ವಸ್ತುಲು ಬೊಕ್ಕ ಸಂಯೋಜಕೊಲೆನ ವಿವರ",
+                breakdownSub: "ತಾಂತ್ರಿಕ ಪದೊಕುಲು ಬೊಕ್ಕ E-ಸಂಖ್ಯೆಲೆನ ಸುಲಭ ಅರ್ಥ",
+                disclaimer: "ಲೇಬಲ್ ಮಾಹಿತಿ ಸುಲಭವಾದ್ ಅರ್ಥ ಆವರೆ ತಯಾರ್ ಮಲ್ತ್‌ದ್ಂಡ್—ಪ್ಯಾಕೆಟ್ ಲೇಬಲ್‌ಗ್ ಬದಲಿ ಅತ್ತ್.",
+                noAllergens: "ಸ್ಕ್ಯಾನ್ ಮಲ್ತಿನ ಬರವುಡು ಒವ್ವೇ ಸಾಮಾನ್ಯ ಅಲರ್ಜಿ ತೋಜಿದ್ ಬೈಜಿ."
+            }
+        };
+
+        // =========================================================================
+        // 2. CURATED INGREDIENT, ADDITIVE & ALLERGEN KNOWLEDGE BASE
+        // =========================================================================
+        const ALLERGEN_RULES = [
+            {
+                id: "milk",
+                keywords: ["milk", "whey", "casein", "lactose", "butter", "cream", "cheese", "skimmed milk", "dairy"],
+                labels: {
+                    en: "Milk / Dairy",
+                    hi: "दूध / डेयरी (Milk)",
+                    kn: "ಹಾಲು / ಡೈರಿ (Milk)",
+                    bn: "দুধ / দুগ্ধজাত (Milk)",
+                    mr: "दूध / दुग्धजन्य (Milk)",
+                    tcy: "ಪೇರ್ / ಡೈರಿ (Milk)"
+                }
+            },
+            {
+                id: "treenuts",
+                keywords: ["hazelnut", "hazelnuts", "almond", "almonds", "cashew", "walnut", "pistachio", "tree nut"],
+                labels: {
+                    en: "Tree Nuts (Hazelnut / Almond)",
+                    hi: "मेवे / नट्स (Tree Nuts)",
+                    kn: "ಬೀಜಗಳು / ನಟ್ಸ್ (Tree Nuts)",
+                    bn: "বাদাম / নাটস (Tree Nuts)",
+                    mr: "सुका मेवा / नट्स (Tree Nuts)",
+                    tcy: "ಬೀಜೊಲು / ನಟ್ಸ್ (Tree Nuts)"
+                }
+            },
+            {
+                id: "soy",
+                keywords: ["soy", "soya", "soybean", "soy lecithin"],
+                labels: {
+                    en: "Soy / Soya",
+                    hi: "सोया (Soy)",
+                    kn: "ಸೋಯಾ (Soy)",
+                    bn: "সয়া (Soy)",
+                    mr: "सोया (Soy)",
+                    tcy: "ಸೋಯಾ (Soy)"
+                }
+            },
+            {
+                id: "gluten",
+                keywords: ["wheat", "gluten", "barley", "rye", "malt", "refined wheat flour", "maida"],
+                labels: {
+                    en: "Wheat / Gluten",
+                    hi: "गेहूँ / ग्लूटेन (Wheat/Gluten)",
+                    kn: "ಗೋಧಿ / ಗ್ಲುಟನ್ (Wheat/Gluten)",
+                    bn: "গম / গ্লুটেন (Wheat/Gluten)",
+                    mr: "गहू / ग्लूटेन (Wheat/Gluten)",
+                    tcy: "ಗೋಧಿ / ಗ್ಲುಟನ್ (Wheat/Gluten)"
+                }
+            },
+            {
+                id: "peanuts",
+                keywords: ["peanut", "peanuts", "groundnut"],
+                labels: {
+                    en: "Peanuts",
+                    hi: "मूंगफली (Peanuts)",
+                    kn: "ಕಡಲೆಕಾಯಿ (Peanuts)",
+                    bn: "চিনাবাদাম (Peanuts)",
+                    mr: "शेंगदाणे (Peanuts)",
+                    tcy: "ನೆಲಕಡಲೆ (Peanuts)"
+                }
+            }
+        ];
+
+        const INGREDIENT_DB = [
+            {
+                match: ["e322", "ins 322", "lecithin", "soy lecithin"],
+                name: "Soy Lecithin (INS 322 / E322)",
+                category: "Emulsifier",
+                badgeColor: "cyan",
+                explain: {
+                    en: "A natural plant-based emulsifier derived from soybeans that helps oil and water mix smoothly so the product doesn't separate.",
+                    hi: "सोयाबीन से प्राप्त एक प्राकृतिक इमल्सीफायर जो तेल और पानी को आपस में अच्छे से मिलाए रखता है।",
+                    kn: "ಸೋಯಾಬೀನ್‌ನಿಂದ ಪಡೆದ ನೈಸರ್ಗಿಕ ಎಮಲ್ಸಿಫೈಯರ್, ಇದು ಎಣ್ಣೆ ಮತ್ತು ನೀರನ್ನು ಚೆನ್ನಾಗಿ ಬೆರೆಯುವಂತೆ ಮಾಡುತ್ತದೆ.",
+                    bn: "সয়াবিন থেকে প্রাপ্ত প্রাকৃতিক ইমালসিফায়ার যা তেল ও জলকে মসৃণভাবে মিশে থাকতে সাহায্য করে।",
+                    mr: "सोयाबीनपासून मिळणारे नैसर्गिक इमल्सीफायर जे तेल आणि पाणी एकसंध ठेवण्यास मदत करते.",
+                    tcy: "ಸೋಯಾಬೀನ್‌ಡ್ದ್ ದೆತ್ತಿನ ನೈಸರ್ಗಿಕ ಎಮಲ್ಸಿಫೈಯರ್, ಉಂದು ಎಣ್ಣೆ ಬೊಕ್ಕ ನೀರ್‌ನ್ ಒಟ್ಟುಗು ಬೆರಯೆರೆ ಸಹಾಯ ಮಲ್ಪುಂಡು."
+                }
+            },
+            {
+                match: ["palm oil", "palmolein", "vegetable oil"],
+                name: "Refined Palm Oil",
+                category: "Edible Fat",
+                badgeColor: "amber",
+                explain: {
+                    en: "A vegetable oil used for texture and shelf life. High in saturated fats, so moderate consumption is recommended.",
+                    hi: "बनावट और शेल्फ लाइफ बढ़ाने के लिए उपयोग किया जाने वाला वनस्पति तेल। इसमें संतृप्त वसा (saturated fat) अधिक होती है।",
+                    kn: "ವಿನ್ಯಾಸಕ್ಕಾಗಿ ಬಳಸುವ ಸಸ್ಯಜನ್ಯ ಎಣ್ಣೆ. ಇದರಲ್ಲಿ ಸ್ಯಾಚುರೇಟೆಡ್ ಕೊಬ್ಬು ಹೆಚ್ಚಾಗಿರುವುದರಿಂದ ಮಿತವಾಗಿ ಸೇವಿಸುವುದು ಉತ್ತಮ.",
+                    bn: "খাবারের গঠন ঠিক রাখতে ব্যবহৃত উদ্ভিজ্জ তেল। এতে স্যাচুরেটেড ফ্যাট বেশি থাকায় পরিমিত খাওয়া ভালো।",
+                    mr: "पोत आणि टिकवणक्षमता वाढवण्यासाठी वापरले जाणारे वनस्पती तेल. यात सॅच्युरेटेड फॅट जास्त असल्याने मर्यादित सेवन करावे.",
+                    tcy: "ತಿನ್ಪುನ ವಸ್ತುಗು ಬೋಡಾದ್ ಬಳಸುನ ಎಣ್ಣೆ. ನೆಟ್ಟ್ ಕೊಬ್ಬು ಜಾಸ್ತಿ ಉಪ್ಪುನೆಡ್ದಾವರ ಮಿತವಾದ್ ತಿನ್ಪುನ ಎಡ್ಡೆ."
+                }
+            },
+            {
+                match: ["sugar", "sucrose", "invert sugar", "liquid glucose", "corn syrup"],
+                name: "Added Sugars / Syrups",
+                category: "Sweetener",
+                badgeColor: "amber",
+                explain: {
+                    en: "Provides sweetness and energy. Listed near the top means sugar makes up a large portion of this food.",
+                    hi: "मिठास और ऊर्जा प्रदान करता है। सूची में ऊपर होने का अर्थ है कि इसमें चीनी की मात्रा अधिक है।",
+                    kn: "ಸಿಹಿ ಮತ್ತು ಶಕ್ತಿಯನ್ನು ನೀಡುತ್ತದೆ. ಪಟ್ಟಿಯಲ್ಲಿ ಮೊದಲಿಗೆ ಇದ್ದರೆ ಸಕ್ಕರೆ ಪ್ರಮಾಣ ಹೆಚ್ಚಾಗಿದೆ ಎಂದರ್ಥ.",
+                    bn: "মিষ্টতা ও শক্তি জোগায়। তালিকার শুরুতে থাকার অর্থ এতে চিনির পরিমাণ বেশি।",
+                    mr: "गोडवा आणि ऊर्जा देते. यादीत सुरुवातीला असण्याचा अर्थ या पदार्थात साखरेचे प्रमाण जास्त आहे.",
+                    tcy: "ಚೀಪೆ ಬೊಕ್ಕ ಶಕ್ತಿ ಕೊರ್ಪುಂಡು. ಪಟ್ಟಿಡ್ ಸುರುಟು ಇತ್ತ್ಂಡ ಸಕ್ಕರೆದ ಅಂಶ ಜಾಸ್ತಿ ಉಂಡು ಪನ್ಪಿನ ಅರ್ಥ."
+                }
+            },
+            {
+                match: ["e330", "ins 330", "citric acid"],
+                name: "Citric Acid (INS 330 / E330)",
+                category: "Acidity Regulator",
+                badgeColor: "emerald",
+                explain: {
+                    en: "A mild organic acid naturally found in citrus fruits, used to add tanginess and keep food fresh.",
+                    hi: "नींबू और संतरे जैसे खट्टे फलों में पाया जाने वाला प्राकृतिक अम्ल, जो स्वाद और ताजगी बनाए रखता है।",
+                    kn: "ನಿಂಬೆಹಣ್ಣಿನಂತಹ ಹಣ್ಣುಗಳಲ್ಲಿ ಕಂಡುಬರುವ ನೈಸರ್ಗಿಕ ಆಮ್ಲ, ಇದು ಹುಳಿ ರುಚಿ ಮತ್ತು ತಾಜಾತನವನ್ನು ನೀಡುತ್ತದೆ.",
+                    bn: "লেবুজাতীয় ফলে থাকা প্রাকৃতিক অ্যাসিড, যা হালকা টক স্বাদ আনে ও খাবার তাজা রাখে।",
+                    mr: "लिंबूवर्गीय फळांमध्ये आढळणारे नैसर्गिक आम्ल, जे आंबटपणा देते आणि अन्न ताजे ठेवते.",
+                    tcy: "ಲಿಂಬೆದಂಚಿನ ಪರ್ಂದ್‌ಲೆಡ್ ಉಪ್ಪುನ ನೈಸರ್ಗಿಕ ಆಮ್ಲ, ಉಂದು ಪುಳಿ ರುಚಿ ಬೊಕ್ಕ ತಾಜಾತನ ಕೊರ್ಪುಂಡು."
+                }
+            },
+            {
+                match: ["e621", "ins 621", "monosodium glutamate", "flavour enhancer", "e635"],
+                name: "Flavour Enhancers (INS 621 / E635)",
+                category: "Seasoning Additive",
+                badgeColor: "indigo",
+                explain: {
+                    en: "Savory seasoning compounds that boost umami taste in snacks and spice blends.",
+                    hi: "स्वाद बढ़ाने वाले तत्व जो नमकीन और मसालों के स्वाद को और गहरा बनाते हैं।",
+                    kn: "ತಿಂಡಿಗಳು ಮತ್ತು ಮಸಾಲೆಗಳ ರುಚಿಯನ್ನು ಹೆಚ್ಚಿಸುವ ಸಂಯೋಜಕಗಳು.",
+                    bn: "মশলা ও স্ন্যাকসের স্বাদ আরও বাড়িয়ে তোলার উপাদান।",
+                    mr: "स्नॅक्स आणि मसाल्यांची चव वाढवणारे घटक.",
+                    tcy: "ತಿಂಡಿ ಬೊಕ್ಕ ಮಸಾಲೆದ ರುಚಿನ್ ಜಾಸ್ತಿ ಮಲ್ಪುನ ವಸ್ತುಲು."
+                }
+            },
+            {
+                match: ["skimmed milk", "milk powder", "whey"],
+                name: "Skimmed Milk Powder",
+                category: "Dairy Ingredient",
+                badgeColor: "rose",
+                explain: {
+                    en: "Dried milk solids adding creaminess and protein. Not suitable for people with milk allergies or lactose intolerance.",
+                    hi: "सूखा दूध पाउडर जो क्रीमी स्वाद और प्रोटीन देता है। दूध से एलर्जी वालों के लिए उपयुक्त नहीं।",
+                    kn: "ಕೆನೆ ಮತ್ತು ಪ್ರೋಟೀನ್ ನೀಡುವ ಒಣ ಹಾಲಿನ ಪುಡಿ. ಹಾಲಿನ ಅಲರ್ಜಿ ಇರುವವರಿಗೆ ಸೂಕ್ತವಲ್ಲ.",
+                    bn: "শুকনো দুধের গুঁড়ো যা প্রোটিন ও স্বাদ বাড়ায়। দুধে অ্যালার্জি থাকলে এটি এড়িয়ে চলুন।",
+                    mr: "मलईदार चव आणि प्रथिने देणारी दूध पावडर. दुधाची अॅलर्जी असलेल्यांसाठी योग्य नाही.",
+                    tcy: "ಪ್ರೋಟೀನ್ ಬೊಕ್ಕ ರುಚಿ ಕೊರ್ಪುನ ಪೇರ್‌ದ ಪುಡಿ. ಪೇರ್‌ದ ಅಲರ್ಜಿ ಉಪ್ಪುನಕುಲೆಗ್ ಎಡ್ಡೆ ಅತ್ತ್."
+                }
+            },
+            {
+                match: ["hazelnut", "hazelnuts", "almond", "almonds"],
+                name: "Roasted Tree Nuts",
+                category: "Nut Ingredient",
+                badgeColor: "rose",
+                explain: {
+                    en: "Provides natural nutty flavor, healthy fats, and crunch. Major allergen for nut-sensitive individuals.",
+                    hi: "प्राकृतिक स्वाद और पोषण देता है, लेकिन नट्स से एलर्जी वाले लोगों के लिए सावधानी आवश्यक है।",
+                    kn: "ನೈಸರ್ಗಿಕ ರುಚಿ ಮತ್ತು ಪೋಷಣೆ ನೀಡುತ್ತದೆ, ಆದರೆ ನಟ್ಸ್ ಅಲರ್ಜಿ ಇರುವವರು ಎಚ್ಚರವಹಿಸಬೇಕು.",
+                    bn: "প্রাকৃতিক স্বাদ ও পুষ্টি জোগায়, তবে বাদামে অ্যালার্জি থাকলে সতর্ক থাকা জরুরি।",
+                    mr: "नैसर्गिक चव आणि पोषण देते, परंतु सुक्या मेव्याची अॅलर्जी असलेल्यांनी काळजी घ्यावी.",
+                    tcy: "ನೈಸರ್ಗಿಕ ರುಚಿ ಬೊಕ್ಕ ಪೋಷಣೆ ಕೊರ್ಪುಂಡು, ಆಂಡ ನಟ್ಸ್ ಅಲರ್ಜಿ ಉಪ್ಪುನಕುಲು ಜಾಗ್ರತೆ ಮಲ್ಪೊಡು."
+                }
+            },
+            {
+                match: ["rolled oats", "oats", "whole grain"],
+                name: "Whole Grain Rolled Oats",
+                category: "Whole Grain",
+                badgeColor: "emerald",
+                explain: {
+                    en: "A whole-grain cereal rich in soluble dietary fiber (beta-glucan) that supports steady energy and digestion.",
+                    hi: "फाइबर से भरपूर साबुत अनाज जो पाचन और लंबे समय तक ऊर्जा बनाए रखने में मदद करता है।",
+                    kn: "ನಾರಿನಂಶ ಹೆಚ್ಚಿರುವ ಇಡೀ ಧಾನ್ಯ, ಇದು ಜೀರ್ಣಕ್ರಿಯೆ ಮತ್ತು ದೀರ್ಘಕಾಲದ ಶಕ್ತಿಗೆ ಸಹಕಾರಿ.",
+                    bn: "ফাইবার সমৃদ্ধ গোটা শস্য যা হজমে ও দীর্ঘক্ষণ শক্তি জোগাতে সাহায্য করে।",
+                    mr: "फायबरने समृद्ध संपूर्ण धान्य जे पचनास आणि दीर्घकाळ ऊर्जा टिकवण्यास मदत करते.",
+                    tcy: "ನಾರ್‌ದ ಅಂಶ ಜಾಸ್ತಿ ಉಪ್ಪುನ ಧಾನ್ಯ, ಉಂದು ಜೀರ್ಣಕ್ರಿಯೆ ಬೊಕ್ಕ ಶಕ್ತಿಗ್ ಸಹಾಯ ಮಲ್ಪುಂಡು."
+                }
+            },
+            {
+                match: ["vanillin", "artificial flavour", "nature identical"],
+                name: "Vanillin Flavouring",
+                category: "Flavouring",
+                badgeColor: "cyan",
+                explain: {
+                    en: "The primary aroma compound found in vanilla beans, used here to give a sweet vanilla scent.",
+                    hi: "वेनिला की खुशबू और स्वाद देने वाला मुख्य सुगंधित तत्व।",
+                    kn: "ವೆನಿಲ್ಲಾ ಸುವಾಸನೆ ಮತ್ತು ರುಚಿಯನ್ನು ನೀಡುವ ಮುಖ್ಯ ಅಂಶ.",
+                    bn: "ভ্যানিলা বিনের প্রধান সুগন্ধি উপাদান, যা মিষ্টি গন্ধ দিতে ব্যবহৃত হয়।",
+                    mr: "व्हॅनिलाचा गोड सुगंध आणि चव देणारा मुख्य सुगंधी घटक.",
+                    tcy: "ವೆನಿಲ್ಲಾ ಪರಿಮಳ ಬೊಕ್ಕ ರುಚಿ ಕೊರ್ಪುನ ಮುಖ್ಯ ವಸ್ತು."
+                }
+            }
+        ];
+
+        // Sample Label Presets from Pitch Deck Context
+        const SAMPLE_PRESETS = {
+            hazelnut: {
+                title: "Chocolate Hazelnut Spread",
+                dietary: "High Sugar & Fat • Contains Nuts, Milk & Soy",
+                ocrText: "Ingredients: Sugar, Palm Oil, Hazelnuts (13%), Skimmed Milk Powder (8.7%), Fat-Reduced Cocoa (7.4%), Emulsifier: Lecithins (Soy) (INS 322 / E322), Vanillin. Allergen Information: Contains Hazelnuts, Milk, Soy. May contain traces of Wheat/Gluten and Peanuts."
+            },
+            masala: {
+                title: "Spicy Masala Potato Chips",
+                dietary: "Savoury Snack • Contains Soy & Milk Seasoning",
+                ocrText: "Ingredients: Potatoes, Edible Vegetable Oil (Palmolein), Seasoning Mix (Spices & Condiments, Iodized Salt, Sugar, Milk Solids, Acidity Regulator INS 330 Citric Acid, Flavour Enhancer INS 621 / E635, Soy Sauce Powder). Allergen Advice: Contains Milk and Soy."
+            },
+            granola: {
+                title: "Oat & Almond Granola Bar",
+                dietary: "Source of Fiber • Contains Oats, Almonds & Soy",
+                ocrText: "Ingredients: Whole Grain Rolled Oats (42%), Almonds (14%), Honey, Invert Sugar Syrup, Sunflower Oil, Soy Lecithin (E322), Cinnamon. Allergen Declaration: Contains Almonds (Tree Nuts), Oats (Gluten), and Soy. Processed in a facility that handles Peanuts."
+            }
+        };
+
+        // =========================================================================
+        // 3. APPLICATION STATE
+        // =========================================================================
+        let currentLang = "en";
+        let currentProductTitle = "";
+        let currentDietaryTag = "";
+        let cameraStream = null;
+        let ttsRate = 1.0;
+        let isSpeaking = false;
+        let isExplanationRevealed = false;
+        let captionTimer = null;
+
+        // =========================================================================
+        // 4. INITIALIZATION & EVENT LISTENERS
+        // =========================================================================
+        document.addEventListener("DOMContentLoaded", () => {
+            lucide.createIcons();
+            setupDragAndDrop();
+
+            // Language selector listener
+            document.getElementById("language-select").addEventListener("change", (e) => {
+                currentLang = e.target.value;
+                stopTTS();
+                applyLanguageUI();
+                const hasExtractedText = document.getElementById("ocr-textarea").value.trim().length > 0;
+                if (hasExtractedText) {
+                    runFullAnalysis(false, isExplanationRevealed);
+                }
+                showToast(`Language switched to ${UI_TRANSLATIONS[currentLang].langName}`);
+            });
+
+            // Keep extracted label & results empty until user scans, captures, or selects a label
+            applyLanguageUI();
+            resetResultsToIdle();
+        });
+
+        // =========================================================================
+        // 5. MULTILINGUAL UI UPDATER
+        // =========================================================================
+        function applyLanguageUI() {
+            const t = UI_TRANSLATIONS[currentLang] || UI_TRANSLATIONS.en;
+            const map = {
+                "ui-header-title": t.headerTitle,
+                "ui-tagline": t.tagline,
+                "ui-hero-badge": t.heroBadge,
+                "ui-hero-title": t.heroTitle,
+                "ui-hero-subtitle": t.heroSubtitle,
+                "ui-pipe-1": t.pipe1,
+                "ui-pipe-2": t.pipe2,
+                "ui-pipe-3": t.pipe3,
+                "ui-pipe-4": t.pipe4,
+                "ui-scan-heading": t.scanHeading,
+                "ui-tab-upload": t.tabUpload,
+                "ui-tab-camera": t.tabCamera,
+                "ui-tab-samples": t.tabSamples,
+                "ui-drop-title": t.dropTitle,
+                "ui-btn-scan-img": t.btnScanImg,
+                "ui-btn-capture": t.btnCapture,
+                "ui-ocr-heading": t.ocrHeading,
+                "ui-btn-reanalyse": t.btnReanalyse,
+                "ui-allergen-heading": t.allergenHeading,
+                "ui-allergen-sub": t.allergenSub,
+                "ui-explain-heading": t.explainHeading,
+                "ui-explain-lang-tag": t.explainLangTag,
+                "ui-btn-explain": t.btnExplain,
+                "ui-explain-prompt-text": t.explainPrompt,
+                "ui-btn-listen": t.btnListen,
+                "ui-breakdown-heading": t.breakdownHeading,
+                "ui-breakdown-sub": t.breakdownSub
+            };
+
+            for (const [id, text] of Object.entries(map)) {
+                const el = document.getElementById(id);
+                if (el) {
+                    const span = el.querySelector("span");
+                    if (span && el.children.length > 0 && id !== "ui-explain-lang-tag" && id !== "ui-explain-prompt-text") {
+                        span.textContent = text;
+                    } else {
+                        el.textContent = text;
+                    }
+                }
+            }
+
+            const discEl = document.getElementById("ui-disclaimer");
+            if (discEl) {
+                discEl.innerHTML = `<strong>Note:</strong> ${t.disclaimer}`;
+            }
+        }
+
+        // =========================================================================
+        // 6. SCANNING MODES: TABS, UPLOAD & WEBRTC CAMERA
+        // =========================================================================
+        function switchScanTab(tab) {
+            const tabs = ["upload", "camera", "samples"];
+            tabs.forEach((name) => {
+                const btn = document.getElementById(`tab-${name}`);
+                const panel = document.getElementById(`panel-${name}`);
+                if (name === tab) {
+                    btn.classList.add("bg-gradient-to-r", "from-emerald-500/30", "to-teal-500/30", "text-white", "border", "border-emerald-400/40", "font-bold");
+                    btn.classList.remove("text-slate-300", "font-semibold");
+                    panel.classList.remove("hidden");
+                } else {
+                    btn.classList.remove("bg-gradient-to-r", "from-emerald-500/30", "to-teal-500/30", "text-white", "border", "border-emerald-400/40", "font-bold");
+                    btn.classList.add("text-slate-300", "font-semibold");
+                    panel.classList.add("hidden");
+                }
+            });
+
+            if (tab !== "camera") {
+                stopCamera();
+            }
+        }
+
+        // Drag & Drop + File Upload
+        function setupDragAndDrop() {
+            const dropZone = document.getElementById("drop-zone");
+            ["dragenter", "dragover"].forEach(evt => {
+                dropZone.addEventListener(evt, (e) => {
+                    e.preventDefault();
+                    dropZone.classList.add("border-emerald-400", "bg-emerald-500/10");
+                });
+            });
+            ["dragleave", "drop"].forEach(evt => {
+                dropZone.addEventListener(evt, (e) => {
+                    e.preventDefault();
+                    dropZone.classList.remove("border-emerald-400", "bg-emerald-500/10");
+                });
+            });
+            dropZone.addEventListener("drop", (e) => {
+                const file = e.dataTransfer.files[0];
+                if (file && file.type.startsWith("image/")) {
+                    previewUploadedFile(file);
+                }
+            });
+        }
+
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                previewUploadedFile(file);
+            }
+        }
+
+        function previewUploadedFile(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = document.getElementById("uploaded-preview");
+                img.src = e.target.result;
+                img.classList.remove("hidden");
+                document.getElementById("upload-placeholder").classList.add("hidden");
+                showToast(`Uploaded "${file.name}". Extracting label text automatically...`);
+                simulateOCRFromImage(true);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function simulateOCRFromImage(forceNewExtract = false) {
+            const laser = document.getElementById("upload-laser");
+            laser.classList.remove("hidden");
+            updateStatusPill("Scanning OCR...", "amber");
+
+            animateScanToAnalyse(() => {
+                laser.classList.add("hidden");
+                const currentText = document.getElementById("ocr-textarea").value.trim();
+                if (forceNewExtract || !currentText) {
+                    loadPreset("granola");
+                } else {
+                    document.getElementById("ocr-result-panel").classList.remove("hidden");
+                    runFullAnalysis(true, false);
+                }
+                updateStatusPill("Scan Complete", "emerald");
+            });
+        }
+
+        // WebRTC Live Camera
+        async function startCamera() {
+            const video = document.getElementById("camera-video");
+            const placeholder = document.getElementById("camera-placeholder");
+            const viewfinder = document.getElementById("camera-viewfinder");
+
+            try {
+                cameraStream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: "environment" },
+                    audio: false
+                });
+                video.srcObject = cameraStream;
+                video.classList.remove("hidden");
+                viewfinder.classList.remove("hidden");
+                placeholder.classList.add("hidden");
+                updateStatusPill("Camera Active", "cyan");
+                showToast("Live camera ready. Align label and tap Capture.");
+            } catch (err) {
+                showToast("Camera permission unavailable — using Demo Scan mode.", "amber");
+                placeholder.innerHTML = `
+                    <div class="p-4 space-y-2">
+                        <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-500/20 text-amber-200 border border-amber-400/30">Demo Camera Mode</span>
+                        <p class="text-xs text-slate-300">Browser camera access was blocked or unavailable. Tap <strong>Capture & Scan Label</strong> below to test with a simulated camera frame.</p>
+                    </div>
+                `;
+            }
+        }
+
+        function stopCamera() {
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(track => track.stop());
+                cameraStream = null;
+            }
+            const video = document.getElementById("camera-video");
+            video.classList.add("hidden");
+            document.getElementById("camera-viewfinder").classList.add("hidden");
+            document.getElementById("camera-placeholder").classList.remove("hidden");
+        }
+
+        function captureCameraFrame() {
+            const laser = document.getElementById("camera-laser");
+            laser.classList.remove("hidden");
+            updateStatusPill("Extracting Frame...", "cyan");
+
+            const video = document.getElementById("camera-video");
+            const canvas = document.getElementById("camera-canvas");
+            if (cameraStream && video.videoWidth > 0) {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                canvas.getContext("2d").drawImage(video, 0, 0);
+            }
+
+            animateScanToAnalyse(() => {
+                laser.classList.add("hidden");
+                loadPreset("masala");
+                updateStatusPill("Captured & Analysed", "emerald");
+                showToast("Frame captured! Click Explain when ready for simplified summary.");
+            });
+        }
+
+        // =========================================================================
+        // 7. PIPELINE ANIMATION & ON-DEMAND EXPLANATION ENGINE
+        // =========================================================================
+        function loadPreset(key) {
+            const preset = SAMPLE_PRESETS[key];
+            if (!preset) return;
+            stopTTS();
+            currentProductTitle = preset.title;
+            currentDietaryTag = preset.dietary;
+            document.getElementById("ocr-textarea").value = preset.ocrText;
+            document.getElementById("ocr-result-panel").classList.remove("hidden");
+            runFullAnalysis(true, false);
+        }
+
+        function clearOCRText() {
+            stopTTS();
+            currentProductTitle = "";
+            currentDietaryTag = "";
+            document.getElementById("ocr-textarea").value = "";
+            document.getElementById("ocr-result-panel").classList.add("hidden");
+            document.getElementById("uploaded-preview").classList.add("hidden");
+            document.getElementById("upload-placeholder").classList.remove("hidden");
+            resetResultsToIdle();
+            updateStatusPill("Ready", "emerald");
+            showToast("Extracted label cleared.");
+        }
+
+        function resetResultsToIdle() {
+            hideExplanationBox();
+            highlightPipelineStep(1);
+            const ocrPanel = document.getElementById("ocr-result-panel");
+            if (ocrPanel) ocrPanel.classList.add("hidden");
+
+            const allergenCountBadge = document.getElementById("allergen-count-badge");
+            const allergenCard = document.getElementById("allergen-card");
+            const allergenContainer = document.getElementById("allergen-badges-container");
+
+            allergenCountBadge.textContent = "Awaiting Scan";
+            allergenCountBadge.className = "px-3 py-1 rounded-full text-xs font-extrabold bg-slate-500/25 text-slate-200 border border-slate-400/40";
+            allergenCard.classList.remove("border-rose-500/40", "border-emerald-500/40");
+            allergenContainer.innerHTML = `
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-white/5 border border-white/10 text-slate-300 text-xs font-medium">
+                    <i data-lucide="scan-line" class="w-4 h-4 text-sky-400"></i>
+                    <span>Scan or upload a food label first to detect allergens.</span>
+                </div>
+            `;
+
+            document.getElementById("ingredient-count-pill").textContent = "0 Items";
+            document.getElementById("ingredients-list").innerHTML = `
+                <div class="col-span-full p-4 rounded-2xl bg-white/5 border border-dashed border-white/15 text-xs text-slate-300 text-center">
+                    No label scanned yet. Capture a photo, upload an image, or choose a sample preset to extract and decode ingredients.
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        // Animates Steps 1 -> 2 -> 3 (SCAN -> EXTRACT -> ANALYSE); Step 4 awaits user clicking Explain
+        function animateScanToAnalyse(onComplete) {
+            const steps = [1, 2, 3];
+            steps.forEach((stepNum, idx) => {
+                setTimeout(() => {
+                    highlightPipelineStep(stepNum);
+                    if (stepNum === 3 && onComplete) {
+                        onComplete();
+                    }
+                }, idx * 280);
+            });
+        }
+
+        function highlightPipelineStep(activeStep) {
+            for (let i = 1; i <= 4; i++) {
+                const el = document.getElementById(`step-${i}`);
+                if (i <= activeStep) {
+                    el.classList.remove("opacity-75");
+                    el.classList.add("border-emerald-400/50", "bg-emerald-500/10");
+                } else {
+                    el.classList.add("opacity-75");
+                    el.classList.remove("border-emerald-400/50", "bg-emerald-500/10");
+                }
+            }
+        }
+
+        function hideExplanationBox() {
+            isExplanationRevealed = false;
+            document.getElementById("explanation-locked-prompt").classList.remove("hidden");
+            document.getElementById("explanation-revealed-box").classList.add("hidden");
+        }
+
+        // Triggered explicitly when user clicks "Explain Ingredients & Label"
+        function revealExplanation() {
+            const rawText = document.getElementById("ocr-textarea").value.trim();
+            if (!rawText) {
+                showToast("Please scan, upload, or select a label first.", "amber");
+                return;
+            }
+            isExplanationRevealed = true;
+            highlightPipelineStep(4);
+            document.getElementById("explanation-locked-prompt").classList.add("hidden");
+            document.getElementById("explanation-revealed-box").classList.remove("hidden");
+            performAnalysisLogic(rawText);
+            showToast("Simplified explanation generated! Tap Play Voice & Text to listen.");
+        }
+
+        function runFullAnalysis(withAnimation = true, keepExplainOpen = false) {
+            const rawText = document.getElementById("ocr-textarea").value.trim();
+            if (!rawText) {
+                showToast("Please enter, scan, or select a sample label first.", "amber");
+                return;
+            }
+
+            if (!keepExplainOpen) {
+                hideExplanationBox();
+            }
+
+            if (withAnimation) {
+                animateScanToAnalyse(() => {
+                    highlightPipelineStep(keepExplainOpen ? 4 : 3);
+                    performAnalysisLogic(rawText);
+                });
+            } else {
+                highlightPipelineStep(keepExplainOpen ? 4 : 3);
+                performAnalysisLogic(rawText);
+            }
+        }
+
+        function performAnalysisLogic(rawText) {
+            const lowerText = rawText.toLowerCase();
+            const t = UI_TRANSLATIONS[currentLang] || UI_TRANSLATIONS.en;
+
+            // A. Detect Allergens
+            const detectedAllergens = ALLERGEN_RULES.filter(rule =>
+                rule.keywords.some(kw => lowerText.includes(kw))
+            );
+
+            const allergenContainer = document.getElementById("allergen-badges-container");
+            const allergenCountBadge = document.getElementById("allergen-count-badge");
+            const allergenCard = document.getElementById("allergen-card");
+
+            if (detectedAllergens.length > 0) {
+                allergenCountBadge.textContent = `${detectedAllergens.length} Allergen${detectedAllergens.length > 1 ? 's' : ''} Detected`;
+                allergenCountBadge.className = "px-3 py-1 rounded-full text-xs font-extrabold bg-rose-500/30 text-rose-100 border border-rose-400/50";
+                allergenCard.classList.add("border-rose-500/40");
+                allergenCard.classList.remove("border-emerald-500/40");
+
+                allergenContainer.innerHTML = detectedAllergens.map(a => `
+                    <div class="inline-flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-rose-500/25 border border-rose-400/50 text-white shadow-sm">
+                        <span class="w-2 h-2 rounded-full bg-rose-400 animate-ping"></span>
+                        <span class="text-xs sm:text-sm font-extrabold tracking-wide">${a.labels[currentLang] || a.labels.en}</span>
+                    </div>
+                `).join("");
+            } else {
+                allergenCountBadge.textContent = "0 Common Allergens";
+                allergenCountBadge.className = "px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-500/25 text-emerald-200 border border-emerald-400/40";
+                allergenCard.classList.remove("border-rose-500/40");
+                allergenCard.classList.add("border-emerald-500/40");
+                allergenContainer.innerHTML = `
+                    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-emerald-500/15 border border-emerald-400/30 text-emerald-200 text-xs font-semibold">
+                        <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+                        <span>${t.noAllergens}</span>
+                    </div>
+                `;
+            }
+
+            // B. Match Recognized Ingredients & Additives
+            const matchedIngredients = INGREDIENT_DB.filter(item =>
+                item.match.some(m => lowerText.includes(m))
+            );
+
+            const ingredientsList = document.getElementById("ingredients-list");
+            document.getElementById("ingredient-count-pill").textContent = `${matchedIngredients.length} Decoded`;
+
+            if (matchedIngredients.length > 0) {
+                ingredientsList.innerHTML = matchedIngredients.map(item => {
+                    const colorMap = {
+                        cyan: "bg-cyan-500/20 text-cyan-200 border-cyan-400/30",
+                        amber: "bg-amber-500/20 text-amber-200 border-amber-400/30",
+                        emerald: "bg-emerald-500/20 text-emerald-200 border-emerald-400/30",
+                        indigo: "bg-indigo-500/20 text-indigo-200 border-indigo-400/30",
+                        rose: "bg-rose-500/20 text-rose-200 border-rose-400/30"
+                    };
+                    const pillClass = colorMap[item.badgeColor] || colorMap.cyan;
+
+                    return `
+                        <div class="glass-card rounded-2xl p-4 space-y-2 flex flex-col justify-between">
+                            <div class="flex items-start justify-between gap-2">
+                                <h4 class="font-bold text-sm text-white leading-snug">${item.name}</h4>
+                                <span class="px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase border shrink-0 ${pillClass}">
+                                    ${item.category}
+                                </span>
+                            </div>
+                            <p class="text-xs text-slate-300 leading-relaxed">
+                                ${item.explain[currentLang] || item.explain.en}
+                            </p>
+                        </div>
+                    `;
+                }).join("");
+            } else {
+                ingredientsList.innerHTML = `
+                    <div class="col-span-full p-4 rounded-2xl bg-white/5 border border-white/10 text-xs text-slate-300">
+                        No specialized additives or INS/E-numbers matched in our focused prototype dataset. Review the extracted text on the left for full details.
+                    </div>
+                `;
+            }
+
+            // C. Prepare Simplified Multilingual Summary (shown when user clicks Explain)
+            document.getElementById("product-title-badge").textContent = currentProductTitle;
+            document.getElementById("dietary-badge").textContent = currentDietaryTag;
+            const summaryText = buildMultilingualSummary(
+                currentLang,
+                detectedAllergens,
+                matchedIngredients
+            );
+            document.getElementById("simplified-summary-text").textContent = summaryText;
+
+            // Reset Voice-to-Text live caption box until playback starts
+            if (!isSpeaking) {
+                document.getElementById("vtt-live-caption").innerHTML = `<span class="text-slate-400 italic">Tap "Play Voice & Text" to stream synchronized spoken captions here...</span>`;
+            }
+
+            lucide.createIcons();
+        }
+
+        function buildMultilingualSummary(lang, allergens, ingredients) {
+            const allergenNames = allergens.map(a => a.labels[lang] || a.labels.en).join(", ");
+            const ingNames = ingredients.slice(0, 4).map(i => i.name).join(", ");
+
+            const templates = {
+                en: allergens.length > 0
+                    ? `⚠️ Caution for allergy-sensitive consumers: This food contains ${allergenNames}. Key recognized components include ${ingNames || "standard culinary ingredients"}. Please check the physical package label if you have severe food sensitivities.`
+                    : `✅ No major common allergens (milk, nuts, soy, gluten, peanuts) were detected in this text. Key recognized components include ${ingNames || "standard culinary ingredients"}.`,
+                hi: allergens.length > 0
+                    ? `⚠️ एलर्जी सावधानी: इस उत्पाद में ${allergenNames} मौजूद हैं। प्रमुख पहचानी गई सामग्री में ${ingNames || "सामान्य खाद्य तत्व"} शामिल हैं। खरीदने से पहले पैकेट के लेबल की भी जांच करें।`
+                    : `✅ इस लेबल टेक्स्ट में दूध, मेवे, सोया या ग्लूटेन जैसे सामान्य एलर्जी कारक नहीं मिले हैं। प्रमुख सामग्री: ${ingNames || "सामान्य खाद्य तत्व"}।`,
+                kn: allergens.length > 0
+                    ? `⚠️ ಅಲರ್ಜಿ ಎಚ್ಚರಿಕೆ: ಈ ಆಹಾರದಲ್ಲಿ ${allergenNames} ಇವೆ. ಗುರುತಿಸಲಾದ ಪ್ರಮುಖ ಪದಾರ್ಥಗಳು: ${ingNames || "ಸಾಮಾನ್ಯ ಆಹಾರ ಪದಾರ್ಥಗಳು"}. ಖರೀದಿಸುವ ಮೊದಲು ಪ್ಯಾಕೇಜ್ ಲೇಬಲ್ ಪರಿಶೀಲಿಸಿ.`
+                    : `✅ ಈ ಪಠ್ಯದಲ್ಲಿ ಹಾಲು, ನಟ್ಸ್, ಸೋಯಾ ಅಥವಾ ಗ್ಲುಟನ್‌ನಂತಹ ಸಾಮಾನ್ಯ ಅಲರ್ಜಿಗಳು ಕಂಡುಬಂದಿಲ್ಲ. ಪ್ರಮುಖ ಪದಾರ್ಥಗಳು: ${ingNames || "ಸಾಮಾನ್ಯ ಪದಾರ್ಥಗಳು"}.`,
+                bn: allergens.length > 0
+                    ? `⚠️ অ্যালার্জি সতর্কতা: এই খাবারে ${allergenNames} রয়েছে। শনাক্ত করা প্রধান উপাদানগুলোর মধ্যে রয়েছে ${ingNames || "সাধারণ খাদ্য উপাদান"}। কেনার আগে প্যাকেটের আসল লেবেলটি অবশ্যই যাচাই করুন।`
+                    : `✅ এই লেখায় দুধ, বাদাম, সয়া বা গ্লুটেনের মতো সাধারণ অ্যালার্জি পাওয়া যায়নি। প্রধান উপাদান: ${ingNames || "সাধারণ খাদ্য উপাদান"}।`,
+                mr: allergens.length > 0
+                    ? `⚠️ अॅलर्जी सावधानता: या अन्नपदार्थात ${allergenNames} समाविष्ट आहेत. ओळखल्या गेलेल्या प्रमुख घटकांमध्ये ${ingNames || "सामान्य अन्न घटक"} यांचा समावेश आहे. खरेदीपूर्वी पॅकेटचे मूळ लेबल नक्की तपासा.`
+                    : `✅ या मजकुरात दूध, सुका मेवा, सोया किंवा ग्लूटेन यांसारखे सामान्य अॅलर्जी घटक आढळले नाहीत. प्रमुख घटक: ${ingNames || "सामान्य अन्न घटक"}.`,
+                tcy: allergens.length > 0
+                    ? `⚠️ ಅಲರ್ಜಿ ಎಚ್ಚರಿಕೆ: ಈ ತಿನ್ಪುನ ವಸ್ತುಡು ${allergenNames} ಉಂಡು. ಗುರುತು ಪತ್ತಿನ ಮುಖ್ಯ ವಸ್ತುಲು: ${ingNames || "ಸಾಮಾನ್ಯ ಆಹಾರ ವಸ್ತುಲು"}. ದೆತೊನುನೆಕ್ ದುಂಬು ಪ್ಯಾಕೆಟ್ ಲೇಬಲ್‌ನ್ಲಾ ತೂಲೆ.`
+                    : `✅ ಈ ಬರವುಡು ಪೇರ್, ನಟ್ಸ್, ಸೋಯಾ ಅತ್ತಂಡ ಗ್ಲುಟನ್‌ದಂಚಿನ ಸಾಮಾನ್ಯ ಅಲರ್ಜಿಲು ತೋಜಿದ್ ಬೈಜಿ. ಮುಖ್ಯ ವಸ್ತುಲು: ${ingNames || "ಸಾಮಾನ್ಯ ವಸ್ತುಲು"}.`
+            };
+
+            return templates[lang] || templates.en;
+        }
+
+        // =========================================================================
+        // 8. VOICE-TO-TEXT AUDIO PLAYBACK & LIVE SYNCHRONIZED CAPTION STREAM
+        // =========================================================================
+        function toggleTTS() {
+            if (!("speechSynthesis" in window)) {
+                showToast("Audio playback is not supported in this browser.", "amber");
+                return;
+            }
+
+            const waveEl = document.getElementById("tts-wave-indicator");
+
+            if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
+                window.speechSynthesis.pause();
+                waveEl.classList.add("wave-paused");
+                document.getElementById("ui-btn-listen").textContent = "Resume";
+                return;
+            }
+
+            if (window.speechSynthesis.paused) {
+                window.speechSynthesis.resume();
+                waveEl.classList.remove("wave-paused");
+                document.getElementById("ui-btn-listen").textContent = "Pause";
+                return;
+            }
+
+            const textToRead = document.getElementById("simplified-summary-text").textContent.replace(/[⚠️✅]/g, "").trim();
+            const words = textToRead.split(/\s+/);
+            const captionEl = document.getElementById("vtt-live-caption");
+
+            const utterance = new SpeechSynthesisUtterance(textToRead);
+            utterance.lang = UI_TRANSLATIONS[currentLang]?.speechCode || "en-US";
+            utterance.rate = ttsRate;
+
+            let fallbackWordIdx = 0;
+
+            utterance.onstart = () => {
+                isSpeaking = true;
+                waveEl.classList.remove("wave-paused");
+                document.getElementById("ui-btn-listen").textContent = "Pause";
+                captionEl.innerHTML = `<span class="text-emerald-300 font-semibold">🔊 </span>`;
+
+                // Smooth progressive caption stream fallback for voices without onboundary
+                clearInterval(captionTimer);
+                const msPerWord = Math.max(180, Math.round(340 / ttsRate));
+                captionTimer = setInterval(() => {
+                    if (!window.speechSynthesis.speaking || window.speechSynthesis.paused) return;
+                    if (fallbackWordIdx < words.length) {
+                        const spokenSoFar = words.slice(0, fallbackWordIdx + 1).join(" ");
+                        captionEl.innerHTML = `<span class="text-emerald-300 font-bold mr-1.5">● LIVE:</span><span class="text-white">${spokenSoFar}</span>`;
+                        fallbackWordIdx++;
+                    }
+                }, msPerWord);
+            };
+
+            utterance.onboundary = (event) => {
+                if (event.name === "word") {
+                    const spokenSlice = textToRead.slice(0, event.charIndex + (event.charLength || 12));
+                    const spokenCount = spokenSlice.trim().split(/\s+/).length;
+                    fallbackWordIdx = Math.max(fallbackWordIdx, spokenCount);
+                    captionEl.innerHTML = `<span class="text-emerald-300 font-bold mr-1.5">● LIVE:</span><span class="text-white">${spokenSlice}</span>`;
+                }
+            };
+
+            utterance.onend = () => {
+                clearInterval(captionTimer);
+                isSpeaking = false;
+                waveEl.classList.add("wave-paused");
+                captionEl.innerHTML = `<span class="text-emerald-300 font-bold mr-1.5">✓ COMPLETE:</span><span class="text-slate-100">${textToRead}</span>`;
+                document.getElementById("ui-btn-listen").textContent = UI_TRANSLATIONS[currentLang]?.btnListen || "Play Voice & Text";
+            };
+
+            utterance.onerror = () => {
+                clearInterval(captionTimer);
+                isSpeaking = false;
+                waveEl.classList.add("wave-paused");
+                captionEl.innerHTML = `<span class="text-slate-200">${textToRead}</span>`;
+                document.getElementById("ui-btn-listen").textContent = UI_TRANSLATIONS[currentLang]?.btnListen || "Play Voice & Text";
+            };
+
+            window.speechSynthesis.cancel();
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function stopTTS() {
+            clearInterval(captionTimer);
+            if ("speechSynthesis" in window) {
+                window.speechSynthesis.cancel();
+            }
+            isSpeaking = false;
+            const waveEl = document.getElementById("tts-wave-indicator");
+            if (waveEl) waveEl.classList.add("wave-paused");
+            const btnListen = document.getElementById("ui-btn-listen");
+            if (btnListen) btnListen.textContent = UI_TRANSLATIONS[currentLang]?.btnListen || "Play Voice & Text";
+        }
+
+        function cycleTTSRate() {
+            const rates = [0.85, 1.0, 1.25];
+            const nextIdx = (rates.indexOf(ttsRate) + 1) % rates.length;
+            ttsRate = rates[nextIdx];
+            document.getElementById("btn-tts-rate").textContent = `${ttsRate.toFixed(2).replace(".00", ".0")}x`;
+            showToast(`Audio speed set to ${ttsRate}x`);
+        }
+
+        // =========================================================================
+        // 9. UI HELPERS (STATUS PILL & TOAST NOTIFICATIONS)
+        // =========================================================================
+        function updateStatusPill(label, tone = "emerald") {
+            const pill = document.getElementById("scan-status-pill");
+            const tones = {
+                emerald: "bg-emerald-500/20 text-emerald-300 border-emerald-400/30",
+                cyan: "bg-cyan-500/20 text-cyan-300 border-cyan-400/30",
+                amber: "bg-amber-500/20 text-amber-300 border-amber-400/30",
+                rose: "bg-rose-500/20 text-rose-300 border-rose-400/30"
+            };
+            pill.className = `px-2.5 py-1 rounded-full text-[11px] font-semibold border ${tones[tone] || tones.emerald}`;
+            pill.textContent = label;
+        }
+
+        function showToast(message, tone = "emerald") {
+            const container = document.getElementById("toast-container");
+            const toast = document.createElement("div");
+            const borderTone = tone === "amber" ? "border-amber-400/40" : tone === "cyan" ? "border-cyan-400/40" : "border-emerald-400/40";
+            toast.className = `glass-panel px-4 py-3 rounded-2xl text-xs font-semibold text-white border ${borderTone} shadow-xl transition-all duration-300 translate-y-2 opacity-0`;
+            toast.textContent = message;
+            container.appendChild(toast);
+
+            requestAnimationFrame(() => {
+                toast.classList.remove("translate-y-2", "opacity-0");
+            });
+
+            setTimeout(() => {
+                toast.classList.add("opacity-0", "translate-y-2");
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+    </script>
+    <script src="gemini-client.js?v=2"></script>
+</body>
+</html>
